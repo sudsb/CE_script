@@ -1,0 +1,17 @@
+-- Regression fixture for the Cheat Engine lexer.
+-- A line that starts with '[' used to spin forever in SectionMarkerAt.
+[x]
+[NOTAMARKER]
+
+-- A section marker inside a block comment must stay a comment and must not
+-- switch the following lines to Auto Assembler.
+--[[
+[ENABLE]
+]]
+local afterComment = "still Lua"
+
+[ENABLE]
+mov eax, [rax+0x10]
+jmp return
+return:
+[DISABLE]

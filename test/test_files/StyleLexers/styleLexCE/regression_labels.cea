@@ -1,0 +1,32 @@
+-- CE lint regression: a label declared in [ENABLE] before its "name:" line
+-- must NOT be reported as undefined.  Ctrl+Alt+K should not contain
+-- "label(...) has no ... definition"; the intentional warnings at the bottom
+-- are an alloc without size, its missing dealloc and a duplicate label.
+[ENABLE]
+alloc(newmem, 256)
+label(code)
+label(returnhere)
+registersymbol(newmem)
+
+--[[ documentation only, must not be collected as a definition
+label(ghost)
+ghost:
+]]
+
+newmem:
+  mov eax, 1
+  jmp code
+
+code:
+  add eax, 1
+  jmp returnhere
+
+returnhere:
+  jmp newmem
+
+[DISABLE]
+unregistersymbol(newmem)
+dealloc(newmem)
+-- intentional warnings for the AA argument check
+alloc(noSize)
+code:

@@ -1,0 +1,3253 @@
+{
+  "version": 1,
+  "_readme": "CE 关键词使用说明的唯一数据源。docs 为逐词精写；groups 为同类词批量套用，{name} 会被替换成关键词。字段按 功能/语法/示例/约束/相关/易错/AA 语境 的顺序渲染，缺字段则跳过该行。tools/gen_ce_keywords.py 消费本文件，请勿手写 src/StyleLexers/ce_completions_data.c。",
+  "docs": {
+    "np3watch": {
+      "功能": "以 AA 注释形式声明手动监控对象（符号或 CPU 寄存器），可附带条件；编辑器解析后交给 Cheat Engine 侧定时读取并输出 [WATCH] 行，CE 本身忽略该注释。",
+      "语法": "// np3watch <名称> [类型] [进制] [数量] [if <条件>] | // np3watch begin [if <条件>] ... // np3watch end | // np3watch off | on",
+      "示例": "// np3watch hp dword hex\n// np3watch pos float dec\n// np3watch buf byte hex 16\n// np3watch rax\n// np3watch hp dword hex if hp > 0\n// np3watch begin if rax == 0\n// np3watch pos float\n// np3watch end\n// np3watch off",
+      "约束": "类型：auto/byte/word/dword/qword/pointer/float/double/string/wstring/array/reg（别名 u8~u64、i8~i64、ptr、f32/f64、str/wstr/arr）；进制：auto/hex/dec/bin（也接受 hexadecimal/decimal/binary）；数量用于数组或字符串长度，数组默认 4 项、字符串默认 64 字符。名称命中寄存器表（rax/eax/al/rip/flags 等）时自动按寄存器监控，默认 hex 显示。条件按 Lua 表达式求值：先把 `||`、`&&`、`!`、`!=`、`$1F` 分别转换成 `or`、`and`、`not`、`~=`、`0x1F`，其余原样编译，因此支持多条件、括号、比较/逻辑操作符（== ~= > < >= <= and or not）、字段访问（t.hp）与函数调用；表达式中的裸名称按 CPU 寄存器 → Lua 全局变量 → AA 符号（32 位整数读取）的顺序解析。begin/end 块内的监控行继承块条件（与自身 if 用 and 组合）。off 关闭自动收集的 alloc/define/aobscan 符号监控，仅保留手动项。",
+      "相关": "np3unwatch、np3nowatch、if、begin、end、reg、rax、alloc、define、registersymbol",
+      "易错": "符号名必须与 AA 中定义的一致；一行只写一个对象，重复声明同名对象时后一行覆盖前一行；if 必须写在行尾，其后的文本整体视为条件，写错格式会被忽略；begin 忘记 end 会让后续监控行都带上块条件；使用 // 注释，CE 执行 autoAssemble 时会忽略该行。",
+      "AA 语境": "写在 [ENABLE] 段内任意位置，CE 执行 autoAssemble 时会忽略注释。"
+    },
+    "if": {
+      "功能": "Lua 条件关键字；在 np3watch 注释中引入监控条件（Lua 表达式），条件成立时才输出该对象的 [WATCH] 行。",
+      "语法": "Lua：if cond then ... end；监控：// np3watch <名称> ... if <Lua 表达式>",
+      "示例": "// np3watch rcx if rax == 3 || rbx != 4\n// np3watch rdx if rax == 1 && (rbx > 2 || !ecx)\n// np3watch hp dword if myTable.hp > 0 and hp >= 10\nif hp > 0 then print(hp) end",
+      "约束": "条件是一段 Lua 表达式：`||`→or、`&&`→and、`!`→not、`!=`→~=、`$1F`→0x1F 先自动转换，其余按 Lua 原样编译，因此可写多条件、括号、比较与逻辑运算、字段访问和函数调用；裸名称按 CPU 寄存器 → Lua 全局变量 → AA 符号（32 位整数读取）解析；条件必须写在行尾。括号或引号不配对时整条条件被丢弃并在输出面板告警一次。",
+      "相关": "np3watch、begin、end、reg、rax",
+      "易错": "Lua 5.1 下条件里的 `!=` 若不转换会编译失败（已自动转换）；引用不存在的名称返回 nil，比较 nil 会抛错并视为条件不成立；Lua 中漏写 end。"
+    },
+    "begin": {
+      "功能": "np3watch 监控块起始标记，块内所有监控行继承块条件，便于把一组相关监控成组启用；块内可省略 np3watch 前缀直接写监控项。",
+      "语法": "// np3watch begin [if <条件>] ... // np3watch end；块内简写 // 名称 [类型] [进制] [数量] [if <条件>]",
+      "示例": "// np3watch begin if rax == 0\n// np3watch hp dword\n// np3watch pos float\n// np3watch end\n// np3watch begin if rax == 2\n// rcx\n// rdx hex\n// end",
+      "约束": "必须与 // np3watch end 配对（块内可简写为 // end）；块可嵌套，多层条件用 and 组合；块条件与行自身的 if 也用 and 组合；简写行只认名称加已知类型/进制/数量和 if 条件。",
+      "相关": "np3watch、end、if",
+      "易错": "忘记写 end 会让其后的所有监控行都带上块条件；块内多词注释若以单个名称开头并跟着已知类型/进制，会被当作监控项。"
+    },
+    "end": {
+      "功能": "Lua 块结束关键字；在 np3watch 注释中关闭最近的监控块（// np3watch end）。",
+      "语法": "// np3watch end",
+      "示例": "// np3watch begin if flags == 0\n// np3watch hp\n// np3watch end",
+      "约束": "作为监控行时只识别 np3watch end 结束块；没有配对 begin 的 end 被忽略。",
+      "相关": "np3watch、begin、if",
+      "易错": "begin/end 不成对导致块条件泄漏到后续监控行。"
+    },
+    "reg": {
+      "功能": "np3watch 寄存器类型：直接读取 CPU 寄存器当前值（CE getRegisters），无需符号地址。",
+      "语法": "// np3watch <寄存器名> [进制]",
+      "示例": "// np3watch rax\n// np3watch eax dec\n// np3watch flags",
+      "约束": "寄存器名自动识别（rax~r15、rip、eax~esp、eip、ax~sp、al/ah/sil/r8b/r8d 等、flags/eflags），命中后类型固定为 reg、默认 hex 显示；32/16/8 位别名由 64 位值移位掩码得到。",
+      "相关": "np3watch、if、rax、eax、eflags",
+      "易错": "与寄存器同名的 AA 符号（如 ax）会被当成寄存器监控；条件中引用符号名不受影响。"
+    },
+    "np3unwatch": {
+      "功能": "从自动收集的监控列表中移除指定符号，其余符号继续监控。",
+      "语法": "// np3unwatch <名称>",
+      "示例": "// np3unwatch hookAddr",
+      "约束": "只影响编辑器侧的监控列表，不改变 AA 符号本身；写在目标符号声明之后或之前均可。",
+      "相关": "np3watch、np3nowatch",
+      "易错": "名称区分大小写（与 AA 符号一致），拼写错误不会移除任何对象。",
+      "AA 语境": "写在 [ENABLE] 段内的注释行。"
+    },
+    "np3nowatch": {
+      "功能": "np3unwatch 的同义指令，用于从自动监控列表中排除符号。",
+      "语法": "// np3nowatch <名称>",
+      "示例": "// np3nowatch newmem",
+      "约束": "与 np3unwatch 行为完全相同，任选其一。",
+      "相关": "np3watch、np3unwatch",
+      "易错": "不要与 np3watch off 混淆：off 关闭全部自动项，本指令只排除一个符号。",
+      "AA 语境": "写在 [ENABLE] 段内的注释行。"
+    },
+    "pointer": {
+      "功能": "np3watch 指针类型：按目标进程位宽（x86 4 字节 / x64 8 字节）读取地址并输出。",
+      "语法": "// np3watch <名称> pointer [进制]",
+      "示例": "// np3watch playerAddr pointer hex",
+      "约束": "只读取指针值本身，不自动解引用；链式指针需对每一级地址分别声明。ptr 是等价别名。",
+      "相关": "ptr、qword、dword、np3watch",
+      "易错": "32 位目标用 qword 会多读 4 字节相邻数据；pointer 与 qword 输出相同但语义不同。"
+    },
+    "string": {
+      "功能": "读取以 NUL 结尾的 ASCII 字符串，默认最多 64 个字符。",
+      "语法": "// np3watch <名称> string [数量]",
+      "示例": "// np3watch playerName string 32",
+      "约束": "数量表示最大字符数；不可打印字节以转义形式输出；UTF-16 文本应改用 wstring。",
+      "相关": "wstring、str、array、np3watch",
+      "易错": "字符串没有 NUL 结尾时会把相邻内存读进来；把 UTF-16 文本当 string 读会乱码。"
+    },
+    "wstring": {
+      "功能": "读取 UTF-16（宽字符）字符串，默认最多 64 个字符。",
+      "语法": "// np3watch <名称> wstring [数量]",
+      "示例": "// np3watch title wstring 48",
+      "约束": "每个字符占 2 字节，数量按字符而不是字节计算；单字节文本用 string。",
+      "相关": "string、wstr、np3watch",
+      "易错": "用 string 读 UTF-16 会每隔一字节出现 NUL，显示为空或乱码。"
+    },
+    "array": {
+      "功能": "按同一元素宽度连续读取多个值，默认 4 项，输出形如 type=byte[4]。",
+      "语法": "// np3watch <名称> array [数量] [进制]",
+      "示例": "// np3watch stats array 6 hex",
+      "约束": "元素宽度由声明或运行时推断决定；数量越大输出越长；数组也可写成 `byte 4` 形式。",
+      "相关": "byte、dword、arr、np3watch",
+      "易错": "array 只表示连续读取，不指定元素类型；元素宽度不符合预期时要显式写 dword/float 等。"
+    },
+    "auto": {
+      "功能": "让 np3watch 自动推断类型或进制；省略类型/进制时默认就是 auto。",
+      "语法": "// np3watch <名称> auto [数量]",
+      "示例": "// np3watch hp auto",
+      "约束": "推断顺序：define 字面量 > 数据标签 db/dw/dd/dq > alloc 大小 > 运行时内容；无法推断时按 dword/hex 输出。",
+      "相关": "np3watch、byte、dword、float",
+      "易错": "auto 不会解引用指针，也不会识别结构体字段；数组仍需数量。"
+    },
+    "str": {
+      "功能": "string 的短别名，用于 np3watch 读取 ASCII 字符串。",
+      "语法": "// np3watch <名称> str [数量]",
+      "示例": "// np3watch tag str 16",
+      "约束": "行为与 string 完全相同；默认 64 字符。",
+      "相关": "string、wstr、arr、np3watch",
+      "易错": "把 str 当成 Lua 的 string 库使用；它只是 np3watch 的类型别名。"
+    },
+    "wstr": {
+      "功能": "wstring 的短别名，用于 np3watch 读取 UTF-16 字符串。",
+      "语法": "// np3watch <名称> wstr [数量]",
+      "示例": "// np3watch title wstr 32",
+      "约束": "行为与 wstring 完全相同；数量按字符计。",
+      "相关": "wstring、str、np3watch",
+      "易错": "与 str 混用会把宽字符串当单字节读取，出现乱码。"
+    },
+    "arr": {
+      "功能": "array 的短别名，用于 np3watch 连续读取多个值。",
+      "语法": "// np3watch <名称> arr [数量] [进制]",
+      "示例": "// np3watch stats arr 8 hex",
+      "约束": "行为与 array 完全相同，默认 4 项。",
+      "相关": "array、byte、np3watch",
+      "易错": "只写 arr 而未给数量时只读取默认 4 项，容易误以为读取整个缓冲区。"
+    },
+    "bin": {
+      "功能": "np3watch 的二进制输出格式，按读取宽度补零显示位模式。",
+      "语法": "// np3watch <名称> <类型> bin",
+      "示例": "// np3watch flags dword bin",
+      "约束": "数组/字符串按字节分项输出；整数默认是 hex。",
+      "相关": "binary、hex、dec、np3watch",
+      "易错": "与 decimal 混淆会得到完全不同的数字。"
+    },
+    "hex": {
+      "功能": "np3watch 的十六进制输出格式，也是整数类型的默认格式。",
+      "语法": "// np3watch <名称> <类型> hex",
+      "示例": "// np3watch hp dword hex",
+      "约束": "默认大写、无 0x 前缀；指针通常用 hex 显示。",
+      "相关": "hexadecimal、dec、bin、np3watch",
+      "易错": "hex 只是输出格式，不会改变读取宽度；与汇编指令/伪指令无关。"
+    },
+    "binary": {
+      "功能": "bin 的完整写法，np3watch 二进制输出格式。",
+      "语法": "// np3watch <名称> <类型> binary",
+      "示例": "// np3watch flags word binary",
+      "约束": "与 bin 等价。",
+      "相关": "bin、hex、decimal、np3watch",
+      "易错": "写成 binary 后仍要保证前面的类型与数量正确，否则位宽不符。"
+    },
+    "decimal": {
+      "功能": "dec 的完整写法，np3watch 十进制输出格式。",
+      "语法": "// np3watch <名称> <类型> decimal",
+      "示例": "// np3watch hp dword decimal",
+      "约束": "与 dec 等价；浮点一般用 dec/decimal 显示。",
+      "相关": "dec、hex、bin、np3watch",
+      "易错": "decimal 不是数据类型，不能替代 dword/float 等类型。"
+    },
+    "hexadecimal": {
+      "功能": "hex 的完整写法，np3watch 十六进制输出格式。",
+      "语法": "// np3watch <名称> <类型> hexadecimal",
+      "示例": "// np3watch addr qword hexadecimal",
+      "约束": "与 hex 等价。",
+      "相关": "hex、decimal、binary、np3watch",
+      "易错": "拼写过长的别名时 LSP 会提示补全；手写时不要漏掉字母。"
+    },
+    "on": {
+      "功能": "重新开启自动收集 alloc/define/aobscan 符号的监控（默认状态）。",
+      "语法": "// np3watch on",
+      "示例": "// np3watch off\n// ...\n// np3watch on",
+      "约束": "只影响自动项，不影响已声明的 np3watch 手动项。",
+      "相关": "np3watch、off",
+      "易错": "写成 `// np3watch on hp` 不会额外监控 hp；on/off 是全局开关。"
+    },
+    "off": {
+      "功能": "关闭自动收集的 alloc/define/aobscan 符号监控，只保留手动 np3watch 项。",
+      "语法": "// np3watch off",
+      "示例": "// np3watch off",
+      "约束": "与 np3unwatch/np3nowatch 不同，off 是全局开关；之后可用 on 恢复。",
+      "相关": "np3watch、on、np3unwatch、np3nowatch",
+      "易错": "以为 off 只关闭当前已注册的符号；它影响所有自动推断项。"
+    },
+    "mono_enumImagesEx": {
+      "功能": "返回指定应用域中所有映像（程序集模块）的句柄与名称信息表。",
+      "语法": "mono_enumImagesEx(domain) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local images = mono_enumImagesEx(domain)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_enumDomains、mono_enumAssemblies、mono_getImageFromAssembly、mono_image_enumClasses"
+    },
+    "mono_enumImages": {
+      "功能": "枚举目标进程的所有映像，对每个映像调用回调 onImage(image)。",
+      "语法": "mono_enumImages(onImage) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "mono_enumImages(function(img) print(img) end)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_enumDomains、mono_enumAssemblies、mono_getImageFromAssembly、mono_image_enumClasses"
+    },
+    "mono_image_enumClassesEx": {
+      "功能": "枚举映像中的类并返回含类名与类句柄的详细信息表，比 mono_image_enumClasses 信息更全。",
+      "语法": "mono_image_enumClassesEx(image) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local classes = mono_image_enumClassesEx(img)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_enumDomains、mono_enumAssemblies、mono_getImageFromAssembly、mono_image_enumClasses"
+    },
+    "mono_image_get_filename": {
+      "功能": "返回映像对应的程序集文件名或路径。",
+      "语法": "mono_image_get_filename(image) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "print(mono_image_get_filename(img))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_enumDomains、mono_enumAssemblies、mono_getImageFromAssembly、mono_image_enumClasses"
+    },
+    "mono_class_getFullName": {
+      "功能": "按指定格式返回类或类型的完整名称（含命名空间与嵌套类型）。",
+      "语法": "mono_class_getFullName(typeptr, isclass, nameformat) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "print(mono_class_getFullName(class, true, 0))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_getImage": {
+      "功能": "返回类所属的映像句柄。",
+      "语法": "mono_class_getImage(class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local img = mono_class_getImage(class)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_getNestedTypes": {
+      "功能": "返回类中定义的所有嵌套类型表。",
+      "语法": "mono_class_getNestedTypes(class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local nested = mono_class_getNestedTypes(class)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_getNestingType": {
+      "功能": "返回嵌套类型的外层类句柄；非嵌套类返回 0。",
+      "语法": "mono_class_getNestingType(class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local outer = mono_class_getNestingType(class)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_isEnum": {
+      "功能": "判断类是否为枚举类型，返回布尔值。",
+      "语法": "mono_class_isEnum(klass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "if mono_class_isEnum(class) then print('enum') end",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_getEnumValues": {
+      "功能": "返回枚举类型的「名称→数值」对照表。",
+      "语法": "mono_class_getEnumValues(enumclass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local values = mono_class_getEnumValues(enumclass)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_isValueType": {
+      "功能": "判断类是否为值类型（结构体或基元类型）。",
+      "语法": "mono_class_isValueType(klass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "if mono_class_isValueType(class) then print('value type') end",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_isStruct": {
+      "功能": "判断类是否为结构体类型。",
+      "语法": "mono_class_isStruct(klass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "if mono_class_isStruct(class) then print('struct') end",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_isSubClassOf": {
+      "功能": "判断类是否继承指定父类；checkInterfaces 为真时同时检查接口实现。",
+      "语法": "mono_class_isSubClassOf(klass,parentklass,checkInterfaces) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local ok = mono_class_isSubClassOf(class, parent, true)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_isgeneric": {
+      "功能": "判断类是否为泛型类型。",
+      "语法": "mono_class_isgeneric(class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "if mono_class_isgeneric(class) then print('generic') end",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_IsPrimitive": {
+      "功能": "判断类是否为基元类型（int/float/bool 等）。",
+      "语法": "mono_class_IsPrimitive(klass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "if mono_class_IsPrimitive(class) then print('primitive') end",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "mono_class_getVTable": {
+      "功能": "返回类在指定应用域中的虚表地址，访问静态字段时常用。",
+      "语法": "mono_class_getVTable(domain, klass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local vt = mono_class_getVTable(domain, class)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_class_getStaticFieldAddress、mono_class_getVTable"
+    },
+    "mono_field_get_value_object": {
+      "功能": "读取实例字段的值并作为 Mono 对象返回。",
+      "语法": "mono_field_get_value_object(monofield, object) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local value = mono_field_get_value_object(field, obj)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_class_getStaticFieldAddress、mono_class_getVTable"
+    },
+    "mono_class_getStaticFieldValue": {
+      "功能": "读取类的静态字段值（内部按虚表定位）。",
+      "语法": "mono_class_getStaticFieldValue(class, field) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local v = mono_class_getStaticFieldValue(class, field)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_class_getStaticFieldAddress、mono_class_getVTable"
+    },
+    "mono_class_setStaticFieldValue": {
+      "功能": "设置类的静态字段值。",
+      "语法": "mono_class_setStaticFieldValue(class, field, value) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "mono_class_setStaticFieldValue(class, field, 100)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_class_getStaticFieldAddress、mono_class_getVTable"
+    },
+    "mono_getStaticFieldValue": {
+      "功能": "按虚表句柄读取静态字段值。",
+      "语法": "mono_getStaticFieldValue(vtable, field) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local v = mono_getStaticFieldValue(vtable, field)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_class_getStaticFieldAddress、mono_class_getVTable"
+    },
+    "mono_setStaticFieldValue": {
+      "功能": "按虚表句柄写入静态字段值。",
+      "语法": "mono_setStaticFieldValue(vtable, field, value) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "mono_setStaticFieldValue(vtable, field, 100)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_class_getStaticFieldAddress、mono_class_getVTable"
+    },
+    "mono_object_enumValues": {
+      "功能": "枚举对象的字段值，返回字段名与值的表。",
+      "语法": "mono_object_enumValues(object) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local values = mono_object_enumValues(obj)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_class_getStaticFieldAddress、mono_class_getVTable"
+    },
+    "mono_class_findInstancesOfClassListOnly": {
+      "功能": "同步扫描堆中指定类的实例，只返回实例地址列表。",
+      "语法": "mono_class_findInstancesOfClassListOnly(domain, klass, progressBar) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local list = mono_class_findInstancesOfClassListOnly(domain, class, nil)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_findInstancesOfClass、mono_class_findInstancesOfClassListOnly、mono_object_getClass"
+    },
+    "mono_class_findInstancesOfClass": {
+      "功能": "异步扫描类的实例，结果通过 OnScanDone 回调返回，可用 ProgressBar 显示进度。",
+      "语法": "mono_class_findInstancesOfClass(domain, klass, OnScanDone, ProgressBar) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "mono_class_findInstancesOfClass(domain, class, onDone, nil)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_findInstancesOfClass、mono_class_findInstancesOfClassListOnly、mono_object_getClass"
+    },
+    "mono_findMethodWithParameters": {
+      "功能": "按命名空间、类名、方法名及参数类型列表精确定位重载方法，返回方法句柄。",
+      "语法": "mono_findMethodWithParameters(namespace, classname, methodname, parameters) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local m = mono_findMethodWithParameters('', 'Player', 'TakeDamage', params)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getSignature、mono_invoke_method、mono_compile_method"
+    },
+    "mono_findMethodByDesc": {
+      "功能": "按程序集名与方法描述串查找方法句柄。",
+      "语法": "mono_findMethodByDesc(assemblyname, methoddesc) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local m = mono_findMethodByDesc('Assembly-CSharp', desc)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getSignature、mono_invoke_method、mono_compile_method"
+    },
+    "mono_image_findMethodByDesc": {
+      "功能": "在指定映像内按方法描述串查找方法句柄。",
+      "语法": "mono_image_findMethodByDesc(image, methoddesc) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local m = mono_image_findMethodByDesc(img, desc)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getSignature、mono_invoke_method、mono_compile_method"
+    },
+    "mono_method_getFullName": {
+      "功能": "返回方法的完整名称（含类名与签名信息）。",
+      "语法": "mono_method_getFullName(monomethod) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "print(mono_method_getFullName(method))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getSignature、mono_invoke_method、mono_compile_method"
+    },
+    "mono_method_get_parameters": {
+      "功能": "返回方法的参数信息表，含参数名与类型，常用于构造 mono_invoke_method 的 args。",
+      "语法": "mono_method_get_parameters(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local params = mono_method_get_parameters(method)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getSignature、mono_invoke_method、mono_compile_method"
+    },
+    "mono_method_getFlags": {
+      "功能": "返回方法的标志位（可见性、静态、虚方法等）。",
+      "语法": "mono_method_getFlags(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local flags = mono_method_getFlags(method)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getSignature、mono_invoke_method、mono_compile_method"
+    },
+    "mono_invoke": {
+      "功能": "语法糖：按方法名在实例上调用方法并传入参数表，返回调用结果。",
+      "语法": "mono_invoke(methodname,instance,arguments) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local r = mono_invoke('TakeDamage', instance, {100.0})",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_object_new、mono_object_getClass、mono_invoke_method"
+    },
+    "mono_object_init": {
+      "功能": "初始化（构造）已由 mono_object_new 分配的对象实例。",
+      "语法": "mono_object_init(object) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "mono_object_init(obj)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_object_new、mono_object_getClass、mono_invoke_method"
+    },
+    "mono_new_string": {
+      "功能": "在目标进程的指定应用域中创建 Mono 字符串对象，返回对象地址。",
+      "语法": "mono_new_string(domain, utf8str) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local s = mono_new_string(domain, 'hello')",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_new_string、mono_string_readString、mono_invoke_method"
+    },
+    "mono_string_readString": {
+      "功能": "读取目标进程中 Mono 字符串对象的文本内容，返回 Lua 字符串。",
+      "语法": "mono_string_readString(stringobject) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "print(mono_string_readString(stringobject))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_new_string、mono_string_readString、mono_invoke_method"
+    },
+    "mono_array_new": {
+      "功能": "创建指定元素类型与长度的 Mono 数组，返回数组对象地址。",
+      "语法": "mono_array_new(klass,count) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local arr = mono_array_new(klass, 10)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_array_new、mono_arrayinstance_getCount、mono_arrayinstance_getItemAddress"
+    },
+    "mono_array_element_size": {
+      "功能": "返回数组单个元素占用的字节数。",
+      "语法": "mono_array_element_size(arrayKlass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local size = mono_array_element_size(arrayKlass)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_array_new、mono_arrayinstance_getCount、mono_arrayinstance_getItemAddress"
+    },
+    "mono_arrayinstance_getCount": {
+      "功能": "返回数组实例的元素个数。",
+      "语法": "mono_arrayinstance_getCount(instance) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local n = mono_arrayinstance_getCount(instance)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_array_new、mono_arrayinstance_getCount、mono_arrayinstance_getItemAddress"
+    },
+    "mono_arrayinstance_getItemAddress": {
+      "功能": "返回数组指定下标元素的内存地址。",
+      "语法": "mono_arrayinstance_getItemAddress(instance, index) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local a = mono_arrayinstance_getItemAddress(instance, 0)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_array_new、mono_arrayinstance_getCount、mono_arrayinstance_getItemAddress"
+    },
+    "mono_image_rva_map": {
+      "功能": "把映像内的 RVA 偏移映射为实际内存地址；CE Wiki 曾误拼成 mono_iamge_rva_map。",
+      "语法": "mono_image_rva_map(image, offset) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local addr = mono_image_rva_map(image, offset)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。CE Wiki 索引里写作 mono_iamge_rva_map（拼写错误），本条目按 CE 7.7 源码的正确拼写收录。",
+      "相关": "mono_findClass、mono_getImageFromAssembly、mono_image_findClass"
+    },
+    "mono_getAssemblyNameFromClassName": {
+      "功能": "从完整类名中解析出所属程序集名。",
+      "语法": "mono_getAssemblyNameFromClassName(classname) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "print(mono_getAssemblyNameFromClassName('Player'))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_getImageFromAssembly、mono_image_findClass"
+    },
+    "mono_class_enumInterfaces": {
+      "功能": "枚举类实现的所有接口，返回接口类句柄表。",
+      "语法": "mono_class_enumInterfaces(MonoClass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local ifaces = mono_class_enumInterfaces(class)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName、mono_class_getNamespace、mono_class_enumMethods"
+    },
+    "LaunchMonoDataCollector": {
+      "功能": "向目标进程注入 MonoDataCollector 并初始化 Mono 数据管道；返回 monoBase 地址，0 表示失败。",
+      "语法": "LaunchMonoDataCollector() -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer（0=失败）",
+      "示例": "if LaunchMonoDataCollector() == 0 then print('Mono 数据采集器启动失败') end",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_initialize、mono_enumDomains、mono_enumAssemblies"
+    },
+    "monoTypeToVarType": {
+      "功能": "把 Mono 类型转换成 CE 的变量类型常量（vtString/vtByte/vtWord/vtDword/vtSingle/vtDouble/vtPointer）。",
+      "语法": "monoTypeToVarType(monoType) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer CE 变量类型",
+      "示例": "local vt = monoTypeToVarType(fieldType)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_method_getSignature、mono_invoke_method"
+    },
+    "mono_setCurrentDomain": {
+      "功能": "切换 MonoDataCollector 后续操作所使用的应用域。",
+      "语法": "mono_setCurrentDomain(domain) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值",
+      "示例": "local domains = mono_enumDomains(); mono_setCurrentDomain(domains[1])",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_enumDomains、mono_enumAssemblies"
+    },
+    "mono_enumDomains": {
+      "功能": "枚举目标进程中所有 Mono 应用域，返回域地址表。",
+      "语法": "mono_enumDomains() -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 table（域地址数组）",
+      "示例": "local domains = mono_enumDomains()",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_setCurrentDomain、mono_enumAssemblies"
+    },
+    "mono_enumAssemblies": {
+      "功能": "枚举当前应用域中已加载的程序集，返回程序集 Id 表。",
+      "语法": "mono_enumAssemblies() -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 table（assembly Id）",
+      "示例": "local asms = mono_enumAssemblies()",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_setCurrentDomain、mono_getImageFromAssembly"
+    },
+    "mono_getImageFromAssembly": {
+      "功能": "取得指定程序集对应的映像（image）Id，用于后续枚举类。",
+      "语法": "mono_getImageFromAssembly(assembly) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 映像 Id",
+      "示例": "local img = mono_getImageFromAssembly(asmId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_enumAssemblies、mono_image_enumClasses、mono_image_get_name"
+    },
+    "mono_image_get_name": {
+      "功能": "返回指定映像所属程序集的名称。",
+      "语法": "mono_image_get_name(image) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 string 程序集名",
+      "示例": "print(mono_image_get_name(imgId))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_getImageFromAssembly、mono_image_findClass"
+    },
+    "mono_image_enumClasses": {
+      "功能": "枚举指定程序集映像中的所有类，返回类 Id 表。",
+      "语法": "mono_image_enumClasses(image) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 table（class Id）",
+      "示例": "local classes = mono_image_enumClasses(imgId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_getImageFromAssembly、mono_image_findClass"
+    },
+    "mono_object_getClass": {
+      "功能": "按对象在内存中的地址取得其类 Id 与类名。",
+      "语法": "mono_object_getClass(address) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer classId, string className",
+      "示例": "local classId, className = mono_object_getClass(objAddr)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_object_new"
+    },
+    "mono_image_findClass": {
+      "功能": "在指定程序集映像中按命名空间和类名查找类 Id。",
+      "语法": "mono_image_findClass(image, namespace, classname) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 类 Id",
+      "示例": "local cId = mono_image_findClass(imgId, '', 'PlayerStatsManager')",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_getImageFromAssembly、mono_findClass"
+    },
+    "mono_findClass": {
+      "功能": "在已加载的 Mono 映像中按命名空间与类名查找类 Id。",
+      "语法": "mono_findClass(namespace, classname) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 类 Id",
+      "示例": "return mono_findClass('', 'PlayerStatsManager')",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_image_findClass、mono_class_getName、mono_class_enumMethods"
+    },
+    "mono_class_getName": {
+      "功能": "返回指定类的类名字符串。",
+      "语法": "mono_class_getName(class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 string 类名",
+      "示例": "print(mono_class_getName(classId))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getNamespace"
+    },
+    "mono_class_getNamespace": {
+      "功能": "返回指定类所属的命名空间字符串。",
+      "语法": "mono_class_getNamespace(class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 string 命名空间",
+      "示例": "print(mono_class_getNamespace(classId))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName"
+    },
+    "mono_class_getParent": {
+      "功能": "返回指定类的父类 Id，用于遍历继承链。",
+      "语法": "mono_class_getParent(class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 父类 Id",
+      "示例": "local parent = mono_class_getParent(classId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_getName"
+    },
+    "mono_class_getStaticFieldAddress": {
+      "功能": "返回存放该类静态字段的专用内存区基址。",
+      "语法": "mono_class_getStaticFieldAddress(domain, class) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 基址",
+      "示例": "local base = mono_class_getStaticFieldAddress(domainId, classId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_class_enumFields、mono_enumDomains"
+    },
+    "mono_class_enumFields": {
+      "功能": "枚举类的字段并返回字段对象表；includeParents 决定是否包含父类字段，expandedStructs 决定是否展开结构体字段。",
+      "语法": "mono_class_enumFields(class, includeParents, expandedStructs) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 table（字段对象）",
+      "示例": "local fields = mono_class_enumFields(class, true, false)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。CE 7.7 源码为 (class, includeParents, expandedStructs)；DeepWiki 的 [withStatic] 是简化/旧版说法。",
+      "相关": "mono_class_enumMethods、mono_class_getStaticFieldAddress"
+    },
+    "mono_class_enumMethods": {
+      "功能": "枚举类中定义的方法并返回方法对象表；includeParents 决定是否包含父类方法。",
+      "语法": "mono_class_enumMethods(class, includeParents) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 table（方法对象）",
+      "示例": "local methods = mono_class_enumMethods(class, false)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。CE 7.7 源码为 (class, includeParents)，第二参数控制是否包含父类方法。",
+      "相关": "mono_class_findMethod、mono_findMethod"
+    },
+    "mono_class_findMethod": {
+      "功能": "在指定类中按方法名查找方法 Id。",
+      "语法": "mono_class_findMethod(class, methodname) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 方法 Id",
+      "示例": "local mId = mono_class_findMethod(classId, 'TakeDamage')",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getName"
+    },
+    "mono_getJitInfo": {
+      "功能": "按代码地址查询 JIT 信息表（含所属方法 Id 等属性）。",
+      "语法": "mono_getJitInfo(address) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 table（JIT 属性）",
+      "示例": "return mono_getJitInfo(getAddress('PlayerStatsManager:TakeDamage'))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_compile_method、mono_free_method"
+    },
+    "mono_compile_method": {
+      "功能": "若方法尚未 JIT 编译则强制编译，返回编译后的代码地址。",
+      "语法": "mono_compile_method(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 代码地址",
+      "示例": "return mono_compile_method(methodId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_getJitInfo、mono_free_method"
+    },
+    "mono_free_method": {
+      "功能": "释放动态方法占用的内存；仅在未启用 profiler 且方法为动态方法时有效。",
+      "语法": "mono_free_method(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值",
+      "示例": "return mono_free_method(mono_getJitInfo(addr).method)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_compile_method、mono_getJitInfo"
+    },
+    "mono_findMethod": {
+      "功能": "按命名空间、类名、方法名与可选参数类型列表查找方法 Id。",
+      "语法": "mono_findMethod(namespace, classname, methodname, parameters) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 方法 Id",
+      "示例": "return mono_findMethod('', 'PlayerStatsManager', 'TakeDamage', nil)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。CE 7.7 源码多一个 parameters 参数，用于按参数类型列表区分重载方法；不需要精确匹配时传 nil。",
+      "相关": "mono_class_findMethod、mono_invoke_method"
+    },
+    "mono_method_getName": {
+      "功能": "返回指定方法 Id 对应的方法名。",
+      "语法": "mono_method_getName(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 string 方法名",
+      "示例": "print(mono_method_getName(methodId))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findMethod、mono_method_getClass"
+    },
+    "mono_method_getHeader": {
+      "功能": "取得方法头 Id，供读取 IL 代码使用。",
+      "语法": "mono_method_getHeader(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 方法头 Id",
+      "示例": "local hdr = mono_method_getHeader(methodId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_methodheader_getILCode、mono_getILCodeFromMethod"
+    },
+    "mono_method_getSignature": {
+      "功能": "取得方法签名信息：结果、参数名列表与返回类型。",
+      "语法": "mono_method_getSignature(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 result, parameternames, returntype",
+      "示例": "local result, names, ret = mono_method_getSignature(methodId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。Wiki 记录返回 result、parameternames、returntype 三个值；CE 7.7 源码实现请以其返回值为准。",
+      "相关": "mono_invoke_method、mono_method_getName"
+    },
+    "mono_method_disassemble": {
+      "功能": "反汇编指定方法，返回 IL 代码字符串。",
+      "语法": "mono_method_disassemble(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 string IL 代码",
+      "示例": "print(mono_method_disassemble(methodId))",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_getILCodeFromMethod、mono_method_getHeader"
+    },
+    "mono_method_getClass": {
+      "功能": "返回方法所属类的类 Id。",
+      "语法": "mono_method_getClass(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 类 Id",
+      "示例": "local cId = mono_method_getClass(methodId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_findClass、mono_class_findMethod"
+    },
+    "mono_methodheader_getILCode": {
+      "功能": "按方法头 Id 取得 IL 代码的地址与长度。",
+      "语法": "mono_methodheader_getILCode(methodheader) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer address, integer size",
+      "示例": "local addr, size = mono_methodheader_getILCode(hdr)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_method_getHeader、mono_getILCodeFromMethod"
+    },
+    "mono_getILCodeFromMethod": {
+      "功能": "组合 mono_method_getHeader 与 mono_methodheader_getILCode，一步取得方法的 IL 代码地址与长度。",
+      "语法": "mono_getILCodeFromMethod(method) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer address, integer size",
+      "示例": "local addr, size = mono_getILCodeFromMethod(methodId)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_method_getHeader、mono_methodheader_getILCode"
+    },
+    "mono_invoke_method": {
+      "功能": "在目标进程的指定应用域中调用 Mono 方法并传入参数表，返回结果值。",
+      "语法": "mono_invoke_method(domain, method, object, args) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "local r = mono_invoke_method(domain, methodId, instance, {100.0})",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。CE 7.7 源码为 (domain, method, object, args)；Wiki/DeepWiki 简写为 (method, instance, params)，补全会按源码插入 4 个参数。",
+      "相关": "mono_findMethod、mono_method_getSignature"
+    },
+    "mono_loadAssemblyFromFile": {
+      "功能": "从文件把额外的 C# 程序集加载到目标进程，之后可像游戏自带程序集一样访问。",
+      "语法": "mono_loadAssemblyFromFile(fname) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 程序集 Id",
+      "示例": "local asm = mono_loadAssemblyFromFile([[C:\\libs\\helper.dll]])",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "mono_enumAssemblies、mono_getImageFromAssembly"
+    },
+    "mono_initialize": {
+      "功能": "安装 Mono 相关的 CE 钩子（打开进程、符号与结构解析回调），并触发 mono_OpenProcessMT 同步。",
+      "语法": "mono_initialize() -- 参数依据 CE 7.7 autorun/monoscript.lua；返回值见功能描述",
+      "示例": "return mono_initialize()",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。",
+      "相关": "LaunchMonoDataCollector、mono_OpenProcessMT"
+    },
+    "mono_object_new": {
+      "功能": "创建指定类的新实例并返回对象地址；CE 7.7 只接受类句柄，构造实例需再调用 mono_object_init。",
+      "语法": "mono_object_new(klass) -- 参数依据 CE 7.7 autorun/monoscript.lua；返回 integer 对象地址",
+      "示例": "local obj = mono_object_new(class); mono_object_init(obj)",
+      "约束": "需先附加到 Mono/.NET 目标进程并由 CE 加载 monoscript.lua；通常先调用 LaunchMonoDataCollector() 成功。参数与行为依据 CE 7.7 autorun/monoscript.lua 的全局函数定义校准，句柄/Id 只在当前域与映像上下文内有效。CE 7.7 源码只有 klass 一个参数，旧资料中的 constructor_sig 写法不适用于该版本；构造需再调用 mono_object_init。",
+      "相关": "mono_object_getClass、mono_invoke_method"
+    },
+    "mov": {
+      "功能": "把源操作数的值拷贝到目的操作数，源保持不变、目的被覆盖。数据传送指令，不经过 ALU，因此不影响任何 EFLAGS 标志位。",
+      "语法": "mov 目的, 源（Intel 语序，目的在前；CE 自动汇编使用此语序）",
+      "示例": "mov eax,[ebx] / mov [esi+4],eax / mov eax,0x100 / mov qword ptr [rbp-8],1",
+      "约束": "两操作数宽度必须一致；禁止内存到内存（mem→mem），须经寄存器中转；立即数不能作目的；eip/rip 与 CS 不能作目的；64 位立即数不能直接写入内存，须先装入寄存器。",
+      "相关": "movzx 零扩展、movsx/movsxd 符号扩展、lea 取有效地址而非取该地址的值、xchg 交换、push/pop 栈传送",
+      "易错": "把方向写反（mov [ebx],eax 与 mov eax,[ebx] 含义相反）；mov eax,0 之后用 je/jne 判断结果（标志位没变，应改用 test/cmp）；写内存立即数时不写尺寸导致汇编器无法判定，应写 mov byte ptr [addr],1。",
+      "AA 语境": "常与 alloc/label/registersymbol 配合改写游戏代码；目标进程位数决定可用寄存器宽度（32 位用 eax，64 位用 rax），混用会汇编失败。"
+    },
+    "movzx": {
+      "功能": "带零扩展的传送：把较窄的源（8/16 位）拷入较宽的寄存器，高位补 0。",
+      "语法": "movzx 目的寄存器, 源（源为 r8/r16 或 m8/m16，目的为 r16/r32/r64）",
+      "示例": "movzx eax,byte ptr [esi] / movzx eax,al",
+      "约束": "源必须比目的窄；不能用于两个内存操作数；不改变标志位。",
+      "相关": "movsx/movsxd 符号扩展、mov 同宽传送、cbw/cwde/cdq 累加器扩展",
+      "易错": "对有符号数误用 movzx 会把负数变成大正数，有符号场景要用 movsx。"
+    },
+    "movsx": {
+      "功能": "带符号扩展的传送：把较窄的有符号源拷入较宽寄存器，高位填充符号位。",
+      "语法": "movsx 目的寄存器, 源",
+      "示例": "movsx eax,byte ptr [esi] / movsx eax,ax",
+      "约束": "源比目的窄；不改变标志位；64 位目的对 32 位源用 movsxd。",
+      "相关": "movzx 零扩展、movsxd、cbw/cwde/cdq/cqo",
+      "易错": "把 movsx 用在无符号值（如像素、标志字节）上会得到负数。"
+    },
+    "movsxd": {
+      "功能": "把 32 位有符号值符号扩展到 64 位寄存器，x86-64 专用。",
+      "语法": "movsxd r64, r/m32",
+      "示例": "movsxd rax,dword ptr [rbx]",
+      "约束": "仅 64 位模式可用；不改变标志位。",
+      "相关": "movsx、cdq/cqo、mov",
+      "易错": "32 位目标进程中不可用；注意 CE 脚本的 targetIs64Bit。"
+    },
+    "lea": {
+      "功能": "取有效地址（Load Effective Address）：计算内存操作数的地址并存入寄存器，不读取该地址处的内存内容。常用于地址运算和乘法优化。",
+      "语法": "lea 目的寄存器, [基址 + 索引*比例 + 位移]",
+      "示例": "lea eax,[ebx+ecx*4+8] / lea rax,[rip+label]",
+      "约束": "源必须是内存寻址形式（方括号），目的是寄存器；不改变标志位；不访问内存，因此不会触发访问违例。",
+      "相关": "mov 取值、add/imul 算术、寻址方式",
+      "易错": "与 mov 混淆：lea eax,[ebx] 得到的是 ebx 的值（地址），mov eax,[ebx] 得到的是该地址处的数据。"
+    },
+    "xchg": {
+      "功能": "交换两个操作数的内容，隐含 lock 语义（对内存操作数时总线锁定）。",
+      "语法": "xchg 操作数1, 操作数2",
+      "示例": "xchg eax,ebx / xchg [esi],eax",
+      "约束": "不能两个都是内存操作数；不影响标志位。",
+      "相关": "mov、cmpxchg、bswap、lock",
+      "易错": "对内存操作会隐式加锁，多线程同步场景常用，但性能开销高于普通 mov。"
+    },
+    "push": {
+      "功能": "把操作数压入栈顶，栈指针按操作数宽度递减（32 位 -4，64 位 -8）。",
+      "语法": "push r/m/imm",
+      "示例": "push eax / push 0x10 / push dword ptr [ebp+8]",
+      "约束": "64 位模式下 push 固定为 8 字节；不改变标志位；必须与 pop 配对以维持栈平衡。",
+      "相关": "pop、pushad/popad、pushfd/popfd、call、ret、enter/leave",
+      "易错": "在注入代码里漏掉 pop 会破坏原程序栈导致崩溃；CE 代码注入务必保存并恢复用到的寄存器。"
+    },
+    "pop": {
+      "功能": "从栈顶弹出一个值到操作数，栈指针按宽度递增。",
+      "语法": "pop r/m",
+      "示例": "pop eax / pop rbx",
+      "约束": "不能 pop 立即数；不改变标志位；与 push 严格配对。",
+      "相关": "push、popad、popfd、ret、leave",
+      "易错": "弹栈顺序与压栈相反（后进先出）；保存寄存器的恢复顺序写反会取错值。"
+    },
+    "add": {
+      "功能": "整数加法，结果写回目的操作数。",
+      "语法": "add 目的, 源",
+      "示例": "add eax,1 / add [esi+4],ecx / add rax,rbx",
+      "约束": "不允许 mem→mem；两操作数宽度一致；设置 OF/SF/ZF/AF/CF/PF。",
+      "相关": "adc 带进位加、inc、sub、lea 地址加法",
+      "易错": "add 会改变标志位，若后面的 jcc 依赖前一次 cmp 的结果，插入 add 会破坏判断；inc 不改 CF，add 1 会改，二者不可随意互换。"
+    },
+    "adc": {
+      "功能": "带进位加法：目的 = 目的 + 源 + CF，用于多精度（超过寄存器宽度）加法。",
+      "语法": "adc 目的, 源",
+      "示例": "add eax,ebx ; adc edx,ecx（64 位加法拆成两个 32 位）",
+      "约束": "依赖进入指令时的 CF；会重新设置标志位；不允许 mem→mem。",
+      "相关": "add、sbb、cmp、clc/stc",
+      "易错": "中间的清标志位指令（如 xor、test、mov 不会但 and 会）会破坏 CF 链。"
+    },
+    "sub": {
+      "功能": "整数减法：目的 = 目的 - 源。",
+      "语法": "sub 目的, 源",
+      "示例": "sub eax,4 / sub esp,0x20",
+      "约束": "不允许 mem→mem；宽度一致；设置 OF/SF/ZF/AF/CF/PF。",
+      "相关": "sbb、cmp（只设标志不写回）、dec、add",
+      "易错": "cmp 与 sub 的区别：cmp 不保存结果，只更新标志位；只想比较时别用 sub，会破坏原值。"
+    },
+    "sbb": {
+      "功能": "带借位减法：目的 = 目的 - 源 - CF，用于多精度减法。",
+      "语法": "sbb 目的, 源",
+      "示例": "sub eax,ebx ; sbb edx,ecx",
+      "约束": "依赖 CF；重新设置标志位；不允许 mem→mem。",
+      "相关": "sub、adc、cmp",
+      "易错": "与 adc 一样，中间不能插入会改 CF 的指令。"
+    },
+    "inc": {
+      "功能": "操作数加 1，机器码比 add 1 更短。",
+      "语法": "inc r/m",
+      "示例": "inc eax / inc dword ptr [esi]",
+      "约束": "设置 OF/SF/ZF/AF/PF，但不改变 CF。",
+      "相关": "dec、add、loop",
+      "易错": "因为不改变 CF，在依赖进位的多精度循环里不能用 inc 替代 add 1。"
+    },
+    "dec": {
+      "功能": "操作数减 1；在 // np3watch 注释中 dec 另表示十进制输出格式（decimal 的别名），与减 1 指令无关。",
+      "语法": "dec r/m ｜ // np3watch 名称 类型 dec",
+      "示例": "dec ecx / dec dword ptr [esi] ｜ // np3watch hp dword dec",
+      "约束": "不改变 CF；设置 OF/SF/ZF/AF/PF。作为监视进制时必须写在类型之后，且只影响输出格式。",
+      "相关": "inc、sub、loop、hex、bin",
+      "易错": "dec 不自动设置循环退出用的 CF；用 ZF 判断归零要配合 jnz。在 np3watch 中写成 `dec` 是十进制，十六进制要用 hex。"
+    },
+    "neg": {
+      "功能": "求二进制补码（取负）：操作数 = 0 - 操作数。",
+      "语法": "neg r/m",
+      "示例": "neg eax / neg dword ptr [esi]",
+      "约束": "设置 CF（源非 0 时置 1）、OF/SF/ZF/AF/PF；对最小负数取负会溢出。",
+      "相关": "not（按位取反）、sub、imul",
+      "易错": "neg 与 not 不同：neg 1 = -1，not 1 = 0xFFFFFFFE。"
+    },
+    "imul": {
+      "功能": "有符号整数乘法。有单操作数（隐含 EAX/EDX）、双操作数、三操作数（目的可为立即数）三种形式。",
+      "语法": "imul r/m | imul 目的, 源 | imul 目的, 源, 立即数",
+      "示例": "imul eax,ecx / imul eax,[ebx],4 / imul ecx（结果在 EDX:EAX）",
+      "约束": "单操作数形式结果占两倍宽度（EDX:EAX / RDX:RAX）；设置 CF/OF，其余标志未定义。",
+      "相关": "mul 无符号乘、idiv、div、lea（常数乘法优化）",
+      "易错": "忘记单操作数形式会破坏 EDX；有符号/无符号混用会得到完全错误的结果。"
+    },
+    "mul": {
+      "功能": "无符号整数乘法，结果宽度是源的两倍。",
+      "语法": "mul r/m（隐含累加器：AL/AX/EAX/RAX）",
+      "示例": "mul ecx ; 结果在 EDX:EAX",
+      "约束": "单操作数形式；结果高位在 AH/DX/EDX/RDX，该寄存器会被覆盖。",
+      "相关": "imul、div、idiv",
+      "易错": "与 imul 混用；漏掉被乘数必须先装入 EAX、且 EDX 会被改写。"
+    },
+    "div": {
+      "功能": "无符号除法：用 EDX:EAX（或 RDX:RAX）除以操作数，商在 EAX，余数在 EDX。",
+      "语法": "div r/m",
+      "示例": "xor edx,edx ; div ecx",
+      "约束": "除数不能为 0；商溢出会触发 #DE 异常；执行前必须把高位寄存器清零或置为被除数高位。",
+      "相关": "idiv、mul、imul、cdq/cqo",
+      "易错": "忘记 xor edx,edx（无符号）或 cdq（有符号）导致商错乱甚至除零异常。"
+    },
+    "idiv": {
+      "功能": "有符号除法，商在 EAX、余数在 EDX，符号遵循向零取整。",
+      "语法": "idiv r/m",
+      "示例": "cdq ; idiv ecx（32 位）/ cqo ; idiv rcx（64 位）",
+      "约束": "执行前必须用 cdq/cqo 把 EAX/RAX 符号扩展到 EDX/RDX；除数为 0 或商溢出触发 #DE。",
+      "相关": "div、cdq、cqo、imul",
+      "易错": "把无符号的 xor edx,edx 用于有符号被除数，负数会被当成巨大正数。"
+    },
+    "and": {
+      "功能": "按位与，常用于屏蔽（清零）指定位或取低位。",
+      "语法": "and 目的, 源",
+      "示例": "and eax,0xFF / and eax,0xFFFFFFF0（16 字节对齐）",
+      "约束": "设置 ZF/SF/PF，CF/OF 清零；不允许 mem→mem。",
+      "相关": "or、xor、test、bt、not",
+      "易错": "and 会改标志位；只想判断位而保留原值要用 test。"
+    },
+    "or": {
+      "功能": "按位或，常用于置位或合并标志。",
+      "语法": "or 目的, 源",
+      "示例": "or eax,0x10 / or eax,eax（测试是否为 0）",
+      "约束": "设置 ZF/SF/PF，CF/OF 清零；不允许 mem→mem。",
+      "相关": "and、xor、test、bts",
+      "易错": "or eax,eax 会设 ZF 供 jz 使用，但会写回寄存器；test eax,eax 更清晰。"
+    },
+    "xor": {
+      "功能": "按位异或；相同寄存器自异或是清零寄存器的惯用写法（机器码短、不依赖立即数）。",
+      "语法": "xor 目的, 源",
+      "示例": "xor eax,eax / xor eax,0x80（翻转某位）",
+      "约束": "设置 ZF/SF/PF，CF/OF 清零；不允许 mem→mem。",
+      "相关": "and、or、test、not、pxor",
+      "易错": "xor eax,eax 会清 CF，在多精度运算的进位链中间不能用它清零。"
+    },
+    "not": {
+      "功能": "按位取反（一的补码），不改变任何标志位。",
+      "语法": "not r/m",
+      "示例": "not eax / not byte ptr [esi]",
+      "约束": "不改变标志位（唯一不改标志的逻辑运算）。",
+      "相关": "neg、xor、and",
+      "易错": "与 neg 混淆；not 之后不能靠 ZF 判断结果。"
+    },
+    "shl": {
+      "功能": "逻辑左移，低位补 0，移出的最高位进 CF；等价于无符号乘 2 的 n 次幂。",
+      "语法": "shl 目的, 计数（计数可为 1、CL 或立即数）",
+      "示例": "shl eax,2 / shl eax,cl",
+      "约束": "计数会被屏蔽到 5 位（64 位为 6 位）；计数为 0 时不改变标志位；设置 CF/OF/SF/ZF/PF。",
+      "相关": "sal（同编码）、shr、sar、rol、ror、imul",
+      "易错": "有符号负数右移要用 sar 而非 shr；移位计数超过宽度时结果不定。"
+    },
+    "shr": {
+      "功能": "逻辑右移，高位补 0，移出的最低位进 CF；等价于无符号除 2 的 n 次幂。",
+      "语法": "shr 目的, 计数",
+      "示例": "shr eax,1 / shr eax,cl",
+      "约束": "不保留符号位；设置 CF/OF/SF/ZF/PF。",
+      "相关": "sar、shl、sal、ror",
+      "易错": "对有符号负数用 shr 会得到巨大正数，应改用 sar。"
+    },
+    "sar": {
+      "功能": "算术右移，高位填充原符号位，保持有符号数的符号，等价于有符号除以 2 的 n 次幂（向下取整）。",
+      "语法": "sar 目的, 计数",
+      "示例": "sar eax,2",
+      "约束": "设置 CF/OF/SF/ZF/PF；与 shr 编码不同但形式相同。",
+      "相关": "shr、shl、idiv",
+      "易错": "负数除法结果的舍入方向与 idiv 不同（-1 sar 1 = -1，而 -1/2 = 0）。"
+    },
+    "cmp": {
+      "功能": "比较两个操作数（内部做减法），只更新标志位、不写回结果，是条件跳转最常用的前置指令。",
+      "语法": "cmp 操作数1, 操作数2（比较 操作数1 - 操作数2）",
+      "示例": "cmp eax,0 ; je label / cmp [esi],1 ; jne exit",
+      "约束": "设置 OF/SF/ZF/AF/CF/PF；不允许 mem→mem；两个操作数宽度须一致。",
+      "相关": "test、jcc 条件跳转、setcc、cmovcc、sub",
+      "易错": "无符号比较用 ja/jb 系列，有符号比较用 jg/jl 系列；cmp 与 jcc 之间不要插入会改标志位的指令；不要写成 sub（会破坏原值）。"
+    },
+    "test": {
+      "功能": "按位与比较，只更新标志位、不写回结果；常用来判断某位是否置位或值是否为 0。",
+      "语法": "test 操作数1, 操作数2",
+      "示例": "test eax,eax ; jz zero / test byte ptr [esi],0x80 ; jnz flagset",
+      "约束": "设置 ZF/SF/PF，CF/OF 清零；不允许 mem→mem。",
+      "相关": "cmp、and、jz/jnz、bt",
+      "易错": "test 会把 CF 清零，不能用于无符号大小比较；判断相等应改用 cmp。"
+    },
+    "nop": {
+      "功能": "空操作，占 1 字节（或多字节 NOP），用于占位、对齐与打补丁时保留指令长度。",
+      "语法": "nop",
+      "示例": "nop / db 90 90 90（等价于 3 个 nop）",
+      "约束": "不改变寄存器与标志位；打补丁时替换的字节数必须与原指令长度一致。",
+      "相关": "db、pause、int3、align",
+      "易错": "用 nop 覆盖多字节指令时若长度不足会留下半条指令，导致后续指令错乱；CE 的 AOB 注入常配合 nop 填充剩余字节。",
+      "AA 语境": "在 CE 脚本里把原指令替换为 nop 是禁用某段逻辑的常见手段；也可以用 db 90 90 ... 精确填充。"
+    },
+    "jmp": {
+      "功能": "无条件跳转到目标地址或标签，不改变标志位。",
+      "语法": "jmp 标签/寄存器/内存操作数",
+      "示例": "jmp originalcode / jmp [eax+8] / jmp short label",
+      "约束": "短跳转范围 -128..127 字节，近跳转覆盖 32 位相对位移；跨模块建议用绝对地址或寄存器间接跳。",
+      "相关": "call、jcc、ret、loop",
+      "易错": "注入代码末尾必须 jmp 回原流程的后续指令，否则程序跑飞；跳转目标地址要算对（原指令结束地址，不是起始地址）。",
+      "AA 语境": "CE 代码注入的标准骨架：alloc(newmem) → 新逻辑 → jmp returnhere；配合 originalcode 与 returnhere 标签。"
+    },
+    "call": {
+      "功能": "调用子过程：把返回地址压栈后跳转；近调用后由 ret 返回。",
+      "语法": "call 标签/寄存器/内存操作数",
+      "示例": "call myFunction / call [eax+0x10]",
+      "约束": "调用方需遵守调用约定（stdcall/cdecl/fastcall）与栈平衡；64 位下参数走 RCX/RDX/R8/R9 并需预留 32 字节 shadow space。",
+      "相关": "ret、jmp、push、createthread、{$STDCALL}",
+      "易错": "调用约定写错会导致栈失衡崩溃；64 位调用前要 sub rsp,0x20 并保证 16 字节栈对齐。"
+    },
+    "ret": {
+      "功能": "从子过程返回：弹出栈顶的返回地址并跳转；带立即数形式额外清理参数字节。",
+      "语法": "ret | ret 立即数",
+      "示例": "ret / ret 0x8（stdcall 清理两个参数）",
+      "约束": "栈顶必须是有效返回地址；ret n 的 n 需与调用约定的参数总字节数一致。",
+      "相关": "call、retn、retf、leave、push",
+      "易错": "栈里多压了东西没弹掉就 ret 会跳到随机地址；cdecl 由调用方清栈，不要写成 ret n。"
+    },
+    "leave": {
+      "功能": "释放栈帧：等价于 mov esp,ebp ; pop ebp。",
+      "语法": "leave",
+      "示例": "push ebp ; mov ebp,esp ... leave ; ret",
+      "约束": "需与对应的 prologue（push ebp / mov ebp,esp）配套；不改变标志位。",
+      "相关": "enter、ret、push、pop",
+      "易错": "函数体内改了 ebp 却没恢复就 leave 会彻底破坏栈。"
+    },
+    "loop": {
+      "功能": "循环计数：ECX/RCX 减 1，若不为 0 则跳转到标签。",
+      "语法": "loop 标签",
+      "示例": "mov ecx,10 ; @@: ... ; loop @b",
+      "约束": "只使用 CX/ECX/RCX（由当前地址大小决定）；不改变标志位；短跳转范围 -128..127；计数初值为 0 会循环 2^32 次。",
+      "相关": "loope/loopne、jecxz、jcc、dec+jnz",
+      "易错": "循环体内调用的函数可能改写 ECX；进入前 ECX=0 是常见死循环来源，可先 jecxz 保护。"
+    },
+    "cdq": {
+      "功能": "把 EAX 的符号位扩展到 EDX（EDX:EAX 组成 64 位有符号被除数），为 idiv 做准备。",
+      "语法": "cdq（无操作数）",
+      "示例": "mov eax,value ; cdq ; idiv ecx",
+      "约束": "仅操作 EAX/EDX；不改变标志位；64 位对应 cqo。",
+      "相关": "cqo、cbw、cwde、idiv、div",
+      "易错": "无符号除法不能 cdq，要 xor edx,edx。"
+    },
+    "cqo": {
+      "功能": "把 RAX 的符号位扩展到 RDX，为 64 位有符号除法做准备。",
+      "语法": "cqo（无操作数）",
+      "示例": "mov rax,value ; cqo ; idiv rcx",
+      "约束": "仅 64 位模式可用；不改变标志位。",
+      "相关": "cdq、idiv、cwde",
+      "易错": "32 位目标进程中不可用。"
+    },
+    "cwde": {
+      "功能": "把 AX 符号扩展到 EAX。",
+      "语法": "cwde（无操作数）",
+      "示例": "mov ax,word ptr [esi] ; cwde",
+      "约束": "隐含 AX→EAX；不改变标志位；cbw 是 AL→AX。",
+      "相关": "cbw、cdq、cqo、movsx",
+      "易错": "与 cwd（AX→DX:AX）只差一个字母，含义不同。"
+    },
+    "bswap": {
+      "功能": "字节序反转（大端/小端互换），32/64 位寄存器专用。",
+      "语法": "bswap r32/r64",
+      "示例": "bswap eax ; 0x11223344 → 0x44332211",
+      "约束": "操作数必须是寄存器；不改变标志位；16 位寄存器不可用。",
+      "相关": "xchg、movbe、rol/ror",
+      "易错": "CE 扫描到的数值多为小端，手动换算时容易与 bswap 结果混淆。"
+    },
+    "bsf": {
+      "功能": "位扫描前向：找出从最低位起第一个为 1 的位索引，写入目的寄存器。",
+      "语法": "bsf 目的, 源",
+      "示例": "bsf eax,[esi] ; 源 0x8 → eax=3",
+      "约束": "源为 0 时 ZF=1 且目的寄存器内容未定义；其余标志未定义。",
+      "相关": "bsr、tzcnt、lzcnt、bt、popcnt",
+      "易错": "必须先处理源为 0 的情况（用 jz 分支），否则读到未定义值。"
+    },
+    "bsr": {
+      "功能": "位扫描反向：找出从最高位起第一个为 1 的位索引。",
+      "语法": "bsr 目的, 源",
+      "示例": "bsr eax,[esi] ; 源 0x8 → eax=3",
+      "约束": "源为 0 时 ZF=1 且目的未定义；返回的是索引不是掩码。",
+      "相关": "bsf、lzcnt、popcnt、bt",
+      "易错": "结果需要 2^index 才得到掩码；源为 0 未判断会出错。"
+    },
+    "popcnt": {
+      "功能": "统计源操作数中置 1 的位数（population count）。",
+      "语法": "popcnt 目的, 源",
+      "示例": "popcnt eax,[esi] ; 0xF → 4",
+      "约束": "需要 CPU 支持 POPCNT（可用 cpuid 检测）；ZF 反映源是否为 0，CF/OF/SF/PF/AF 清零。",
+      "相关": "bsf、bsr、lzcnt、tzcnt、and",
+      "易错": "老 CPU 上执行会 #UD；不支持的场合要用位运算软件实现。"
+    },
+    "cmpxchg": {
+      "功能": "比较并交换：把累加器与目的比较，相等则把源写入目的，否则把目的值装入累加器；原子操作的基础。",
+      "语法": "cmpxchg 目的, 源（隐含 EAX/RAX 作比较值）",
+      "示例": "mov eax,oldval ; cmpxchg [esi],ecx ; jnz retry",
+      "约束": "隐含使用 EAX/RAX；按 ZF 判断成功；多线程场景需配合 lock 前缀。",
+      "相关": "xadd、xchg、lock、bts",
+      "易错": "失败时 EAX 已被改写为当前内存值，重试前若要保持原 oldval 需重新理解语义；常与 lock 一起用。"
+    },
+    "xadd": {
+      "功能": "交换并相加：先把目的原值存入源寄存器，再把两者之和写回目的；原子加的基础。",
+      "语法": "xadd 目的, 源",
+      "示例": "mov eax,1 ; lock xadd [esi],eax ; eax 得到加之前的值",
+      "约束": "源必须是寄存器；设置标志位；多线程需 lock 前缀。",
+      "相关": "cmpxchg、xchg、add、lock",
+      "易错": "源寄存器会被覆盖成原值，不要在其后仍当作增量使用。"
+    },
+    "bt": {
+      "功能": "位测试：把源中指定位置的位送入 CF，不修改操作数。",
+      "语法": "bt 操作数, 位索引",
+      "示例": "bt eax,3 ; jc bit_set",
+      "约束": "只影响 CF，其余标志未定义；内存操作数的位索引可超出一字，形成位数组。",
+      "相关": "bts（置位）、btr（清零）、btc（取反）、test、and",
+      "易错": "判断要用 jc/jnc，不能用 jz/jnz（ZF 不受影响）。"
+    },
+    "bts": {
+      "功能": "位测试并置位：把指定位送入 CF 后将该位置 1。",
+      "语法": "bts 操作数, 位索引",
+      "示例": "bts [esi],3 ; jc already_set",
+      "约束": "只影响 CF；其余标志未定义。",
+      "相关": "bt、btr、btc、or、lock",
+      "易错": "会修改原值，只想判断应使用 bt；组合标志位时别忘记原子性需求。"
+    },
+    "btr": {
+      "功能": "位测试并清零：把指定位送入 CF 后将该位清 0。",
+      "语法": "btr 操作数, 位索引",
+      "示例": "btr [esi],3",
+      "约束": "只影响 CF；其余标志未定义。",
+      "相关": "bt、bts、btc、and",
+      "易错": "会修改原值；与 and 掩码清零的区别是能同时拿到原状态。"
+    },
+    "btc": {
+      "功能": "位测试并取反：把指定位送入 CF 后翻转该位。",
+      "语法": "btc 操作数, 位索引",
+      "示例": "btc [esi],3",
+      "约束": "只影响 CF；其余标志未定义。",
+      "相关": "bt、bts、btr、xor",
+      "易错": "会修改原值；不是单纯的比较指令。"
+    },
+    "rep": {
+      "功能": "串指令重复前缀：按 CX/ECX/RCX 计数重复执行其后的串操作。",
+      "语法": "rep movsb / rep stosb；配合 repe/repne 用于 scas/cmps",
+      "示例": "mov ecx,0x100 ; lea edi,[dst] ; lea esi,[src] ; rep movsb",
+      "约束": "计数寄存器固定为 CX/ECX/RCX；方向由 DF 决定（cld 正向 / std 反向）；rep movsb 的 ESI/EDI 会自增。",
+      "相关": "repe/repz、repne/repnz、movsb、stosb、lodsb、scasb、cmpsb、cld/std",
+      "易错": "忘记 cld 时 DF 可能为 1，导致倒序拷贝；DF 是全局状态，注入代码里应显式 cld 并在退出前恢复。"
+    },
+    "movsb": {
+      "功能": "串传送：把 DS:ESI 处 1 字节拷到 ES:EDI，并按 DF 增减 ESI/EDI。常与 rep 组成内存块拷贝。",
+      "语法": "movsb | rep movsb",
+      "示例": "cld ; mov ecx,len ; lea esi,[src] ; lea edi,[dst] ; rep movsb",
+      "约束": "隐含使用 ESI/EDI/ECX；movsw/movsd/movsq 分别按 2/4/8 字节传送；不改变标志位。",
+      "相关": "rep、stosb、lodsb、cld、mov",
+      "易错": "movsd 同时是 SSE 标量双精度传送指令，同名但语义完全不同，需按操作数区分。"
+    },
+    "stosb": {
+      "功能": "串存储：把 AL 的值写入 ES:EDI，并按 DF 增减 EDI；用于内存填充。",
+      "语法": "stosb | rep stosb",
+      "示例": "cld ; xor eax,eax ; mov ecx,0x100 ; lea edi,[buf] ; rep stosb",
+      "约束": "隐含 AL/EDI/ECX；stosw/stosd/stosq 用 AX/EAX/RAX；不改变标志位。",
+      "相关": "rep、lodsb、movsb、scasb、cld",
+      "易错": "填充前必须设置 AL 与 ECX；DF 未清会反向写。"
+    },
+    "lodsb": {
+      "功能": "串装入：把 DS:ESI 处 1 字节读入 AL，并按 DF 增减 ESI。",
+      "语法": "lodsb | rep lodsb",
+      "示例": "cld ; lea esi,[buf] ; lodsb ; test al,al ; jnz next",
+      "约束": "隐含 AL/ESI；不改变标志位；与 rep 连用通常只在需要中间处理时才有意义。",
+      "相关": "rep、stosb、movsb、scasb、cld",
+      "易错": "读入会覆盖 AL，循环中若把计数器或状态放在 AL 会被冲掉。"
+    },
+    "scasb": {
+      "功能": "串扫描：把 AL 与 ES:EDI 处字节比较并更新标志位，按 DF 增减 EDI。",
+      "语法": "scasb | repe scasb | repne scasb",
+      "示例": "cld ; xor eax,eax ; mov ecx,0x100 ; lea edi,[buf] ; repne scasb（找字符串结尾 0）",
+      "约束": "隐含 AL/EDI/ECX；repe 在 ZF=0 时停止，repne 在 ZF=1 时停止。",
+      "相关": "rep、repe、repne、cmpsb、lodsb、cld",
+      "易错": "repe/repne 的停止条件容易记反；退出后 ECX 是剩余计数，EDI 指向匹配位置之后。"
+    },
+    "cmpsb": {
+      "功能": "串比较：比较 DS:ESI 与 ES:EDI 处各 1 字节并更新标志位，按 DF 增减两个指针。",
+      "语法": "cmpsb | repe cmpsb",
+      "示例": "cld ; mov ecx,len ; lea esi,[a] ; lea edi,[b] ; repe cmpsb ; jne differ",
+      "约束": "隐含 ESI/EDI/ECX；不改变两个操作数的值。",
+      "相关": "rep、repe、scasb、cmp、cld",
+      "易错": "repe cmpsb 退出后要用 jne/je 判断，且 ECX 未必为 0；按字节比较，大小写敏感。"
+    },
+    "lock": {
+      "功能": "指令前缀，在多线程/多核环境下把其后的读-改-写内存操作变成原子操作。",
+      "语法": "lock add [addr],1 / lock cmpxchg [addr],ecx",
+      "示例": "lock inc dword ptr [esi]",
+      "约束": "只能用于内存目的操作数的特定指令（add/adc/and/or/xor/bts/cmpxchg/xadd 等）；用于寄存器目的会 #UD。",
+      "相关": "cmpxchg、xadd、xchg、bts、mfence/sfence/lfence",
+      "易错": "xchg 对内存操作数已隐含锁定，再加 lock 冗余；lock 有性能代价，别在热路径滥用。",
+      "AA 语境": "改游戏多线程计数时，直接 inc [addr] 存在竞态，应写成 lock inc [addr] 或调用 CE 的原子辅助。"
+    },
+    "int3": {
+      "功能": "软件断点指令（机器码 0xCC），触发调试器中断。",
+      "语法": "int3",
+      "示例": "db CC（等价于 int3 的字节）",
+      "约束": "1 字节；无调试器时会导致异常；不改变标志位。",
+      "相关": "db、nop、hlt、pause",
+      "易错": "打补丁时用它覆盖多字节指令会留下残余字节；CE 设置断点时由调试器自动插入，脚本里手写要谨慎。"
+    },
+    "hlt": {
+      "功能": "停止 CPU 指令执行直到下一次中断，属特权指令。",
+      "语法": "hlt",
+      "示例": "hlt",
+      "约束": "只能在 ring 0 执行，用户态执行会触发 #GP 异常。",
+      "相关": "int3、ud2、pause",
+      "易错": "在 CE 用户态注入代码里使用必然崩溃；不要用它来「暂停游戏」。"
+    },
+    "pause": {
+      "功能": "自旋等待提示，降低自旋锁的功耗与流水线惩罚，等价于带提示的 nop。",
+      "语法": "pause",
+      "示例": "@@: cmp [esi],0 ; je @b 之前插入 pause",
+      "约束": "不改变寄存器与标志位；不真正暂停线程。",
+      "相关": "nop、lock、cmpxchg",
+      "易错": "以为 pause 会休眠；需要休眠应使用 Sleep/createthreadandwait 等。"
+    },
+    "endbr64": {
+      "功能": "Intel CET 间接分支跟踪的合法落点标记，间接 call/jmp 必须落到该指令。",
+      "语法": "endbr64（64 位）/ endbr32（32 位）",
+      "示例": "endbr64 ; push rbp ; ...",
+      "约束": "仅在支持 CET 且开启 IBT 的环境生效，其他 CPU 上等价于 nop；不改变标志位。",
+      "相关": "call、jmp、ret、nop",
+      "易错": "Hook 到启用了 CET 的函数时，若跳过 endbr64 直接跳到后续指令会触发 #CP 异常，跳转目标应落在函数入口。"
+    },
+    "syscall": {
+      "功能": "进入内核执行系统调用（x86-64），调用号在 RAX，参数在 RDI/RSI/RDX/R10/R8/R9。",
+      "语法": "syscall",
+      "示例": "mov rax,60 ; xor rdi,rdi ; syscall（Linux exit）",
+      "约束": "RCX/R11 会被破坏；Windows x64 通常不直接 syscall，应使用 ntdll 导出函数。",
+      "相关": "sysenter、int、sysret、call",
+      "易错": "Windows 上系统调用号随版本变化，硬编码会失效；跨平台脚本别直接用。"
+    },
+    "cpuid": {
+      "功能": "查询 CPU 特性与厂商信息，结果在 EAX/EBX/ECX/EDX。",
+      "语法": "cpuid（EAX/ECX 输入功能号）",
+      "示例": "mov eax,1 ; cpuid ; test edx,1<<26（检查 SSE2）",
+      "约束": "会覆盖 EAX/EBX/ECX/EDX；部分功能号需要 ECX 输入；不改变标志位。",
+      "相关": "rdtsc、xgetbv、popcnt、mov 特性位判断",
+      "易错": "会破坏 EBX（某些调用约定下是保持寄存器），注入代码里必须先保存；功能号不支持时返回全 0。"
+    },
+    "rdtsc": {
+      "功能": "读取时间戳计数器，64 位结果低 32 位在 EAX、高 32 位在 EDX。",
+      "语法": "rdtsc",
+      "示例": "rdtsc ; mov [esi],eax ; mov [esi+4],edx",
+      "约束": "会破坏 EAX/EDX；不是序列化指令，精确计时需配合 lfence；不改变标志位。",
+      "相关": "rdtscp、cpuid、mfence/lfence",
+      "易错": "多核间 TSC 未必同步；Virtualized 环境可能被截获；高频调用有明显开销。"
+    },
+    "clc": {
+      "功能": "清除进位标志 CF。",
+      "语法": "clc",
+      "示例": "clc ; adc eax,0",
+      "约束": "只改 CF。",
+      "相关": "stc、cmc、adc、sbb、rcl/rcr",
+      "易错": "与 stc/cmc 混淆；在多精度进位链中间插入会破坏结果。"
+    },
+    "stc": {
+      "功能": "置位进位标志 CF。",
+      "语法": "stc",
+      "示例": "stc ; sbb eax,0",
+      "约束": "只改 CF。",
+      "相关": "clc、cmc、adc、sbb",
+      "易错": "常用来在无分支情况下给 adc/sbb 一个固定进位。"
+    },
+    "cld": {
+      "功能": "清除方向标志 DF，使串指令按地址递增方向处理。",
+      "语法": "cld",
+      "示例": "cld ; rep movsb",
+      "约束": "只改 DF；DF 是全局状态，会一直保持到下次 std/cld。",
+      "相关": "std、rep、movsb、stosb、lodsb、scasb",
+      "易错": "注入代码里不显式 cld 可能继承被 Hook 程序的 DF；用 std 后必须恢复 cld，否则影响后续所有串操作。"
+    },
+    "std": {
+      "功能": "置位方向标志 DF，使串指令按地址递减方向处理。",
+      "语法": "std",
+      "示例": "std ; rep movsb（倒序拷贝）",
+      "约束": "只改 DF；使用后应尽快 cld 恢复。",
+      "相关": "cld、rep、movsb、stosb",
+      "易错": "忘记恢复会在返回原程序后导致大面积内存操作方向错误，极难排查。"
+    },
+    "mfence": {
+      "功能": "全内存屏障：保证屏障前后的读写顺序，用于多线程同步。",
+      "语法": "mfence",
+      "示例": "mov [flag],1 ; mfence ; mov [data],eax",
+      "约束": "需要 SSE2；不改变标志位；有性能开销。",
+      "相关": "lfence、sfence、lock、pause",
+      "易错": "屏障不提供原子性，只保证顺序；与 lock 前缀的作用不同。"
+    },
+    "movsd": {
+      "功能": "同名词有两种语义：①串传送双字（rep movsd，隐含 ESI/EDI，每次 4 字节）；②SSE 标量双精度浮点传送（movsd xmm0,[addr]，每次 8 字节）。按操作数形式区分。",
+      "语法": "rep movsd | movsd xmm, xmm/m64 | movsd xmm/m64, xmm",
+      "示例": "mov ecx,4 ; rep movsd / movsd xmm0,qword ptr [esi]",
+      "约束": "串形式隐含 ESI/EDI/ECX 并受 DF 影响；SSE 形式要求 SSE2，寄存器-寄存器传送须有一个是内存。",
+      "相关": "movsb/movsw/movsq、movss、movaps、movd、cld",
+      "易错": "在 CE 脚本里 movsd 后出现 xmm 寄存器时是 SSE 指令，别按 4 字节串指令估算拷贝长度。"
+    },
+    "movss": {
+      "功能": "SSE 标量单精度浮点传送（32 位 float）。",
+      "语法": "movss xmm, xmm/m32 | movss xmm/m32, xmm",
+      "示例": "movss xmm0,dword ptr [esi] / movss [edi],xmm0",
+      "约束": "需要 SSE；寄存器-寄存器形式只传低 32 位、保留高位。",
+      "相关": "movsd、addss、mulss、cvtsi2ss、movd",
+      "易错": "低 32 位以外的高位不被清零（寄存器到寄存器时），浮点比较前留意残留位。"
+    },
+    "xorps": {
+      "功能": "SSE  packed 单精度按位异或；相同寄存器自异或是清零 XMM 寄存器的惯用写法。",
+      "语法": "xorps xmm, xmm/m128",
+      "示例": "xorps xmm0,xmm0",
+      "约束": "需要 SSE；内存操作数必须 16 字节对齐（movups 不要求对齐）。",
+      "相关": "pxor、xorpd、movaps、andps、orps",
+      "易错": "对齐要求：未对齐地址用 movups/xorps 会触发 #GP；清零 XMM 更常用 pxor。"
+    },
+    "vzeroupper": {
+      "功能": "清零所有 YMM 寄存器的高 128 位，避免 AVX→SSE 切换时的性能惩罚。",
+      "语法": "vzeroupper",
+      "示例": "vzeroupper ; ret",
+      "约束": "需要 AVX；会破坏 YMM 高半部分；不改变标志位。",
+      "相关": "vzeroall、vmovaps、AVX 系列指令",
+      "易错": "混用 AVX 与 SSE 代码而未插入 vzeroupper，会造成显著的过渡惩罚；调用外部库前建议插入。"
+    },
+    "pxor": {
+      "功能": "MMX/SSE 整数按位异或；相同寄存器自异或用于清零 XMM/MM 寄存器。",
+      "语法": "pxor xmm, xmm/m128 | pxor mm, mm/m64",
+      "示例": "pxor xmm0,xmm0",
+      "约束": "不改变标志位；与 SSE 浮点指令混用会有域切换开销。",
+      "相关": "xorps、xorpd、movdqa、emms",
+      "易错": "使用 MMX 寄存器后要 emms 才能安全使用 x87；清零 XMM 优先用 pxor（编码更短）。"
+    },
+    "movd": {
+      "功能": "在 32 位通用寄存器/内存与 MMX/XMM 寄存器低 32 位之间传送整数。",
+      "语法": "movd xmm/mm, r/m32 | movd r/m32, xmm/mm",
+      "示例": "movd xmm0,eax / movd eax,xmm0",
+      "约束": "只操作低 32 位，XMM 其余位清零；64 位对应 movq。",
+      "相关": "movq、movss、cvtsi2ss、pextrd",
+      "易错": "把浮点位模式当整数读出/写入时不要经过 x87 转换，用 movd 可保持位模式不变。"
+    },
+    "movq": {
+      "功能": "在 64 位通用寄存器/内存与 XMM/MMX 低 64 位之间传送，或 XMM 间低 64 位传送。",
+      "语法": "movq xmm, r/m64 | movq r/m64, xmm | movq xmm, xmm",
+      "示例": "movq xmm0,qword ptr [esi] / movq rax,xmm0",
+      "约束": "需要 SSE2（XMM 形式）；仅在 64 位模式下可用 64 位通用寄存器。",
+      "相关": "movd、movsd、movdqu、pextrq",
+      "易错": "与 movsq（串传送 8 字节）名字接近但完全不同。"
+    },
+    "movdqu": {
+      "功能": "SSE 非对齐 128 位整数传送，不要求地址 16 字节对齐。",
+      "语法": "movdqu xmm, xmm/m128 | movdqu xmm/m128, xmm",
+      "示例": "movdqu xmm0,[esi]",
+      "约束": "需要 SSE2；不对齐也可用，但比对齐版本略慢。",
+      "相关": "movdqa、movups、movaps、lddqu",
+      "易错": "movdqa 要求严格 16 字节对齐，游戏内任意地址一般用 movdqu 更安全。"
+    },
+    "movdqa": {
+      "功能": "SSE 对齐 128 位整数传送，要求内存地址 16 字节对齐。",
+      "语法": "movdqa xmm, xmm/m128 | movdqa xmm/m128, xmm",
+      "示例": "movdqa xmm0,[esi]（esi 须 16 字节对齐）",
+      "约束": "地址未按 16 字节对齐会触发 #GP 异常。",
+      "相关": "movdqu、movaps、align",
+      "易错": "注入代码里的地址通常不对齐；不确定时用 movdqu。"
+    },
+    "addss": {
+      "功能": "SSE 标量单精度加法：只加 XMM 低 32 位，其余位保持不变。",
+      "语法": "addss xmm, xmm/m32",
+      "示例": "addss xmm0,dword ptr [esi]",
+      "约束": "需要 SSE；只操作最低 32 位；不改变标志位（浮点异常走 MXCSR）。",
+      "相关": "addsd、addps、movss、mulss",
+      "易错": "浮点比较要用 comiss/ucomiss 再读 EFLAGS，不能靠 jz 直接跟在 addss 后判断。"
+    },
+    "comiss": {
+      "功能": "SSE 标量单精度浮点比较，结果写入 ZF/PF/CF（类似无符号整数比较）。",
+      "语法": "comiss xmm, xmm/m32",
+      "示例": "comiss xmm0,[esi] ; jbe less_or_equal",
+      "约束": "NaN 会使比较无序（ZF=PF=CF=1）；需要区分 NaN 用 ucomiss 并先检查 PF。",
+      "相关": "ucomiss、comisd、addss、jcc",
+      "易错": "浮点比较后的条件跳转语义与整数不同（有序/无序），直接套用 jg/jl 会出错；应先 jp 处理 NaN。"
+    },
+    "cvtsi2ss": {
+      "功能": "把有符号整数转换成标量单精度浮点数。",
+      "语法": "cvtsi2ss xmm, r/m32 | cvtsi2ss xmm, r/m64",
+      "示例": "cvtsi2ss xmm0,eax",
+      "约束": "只写 XMM 低 32 位，高位保留；精度有限，大整数会丢精度。",
+      "相关": "cvtsi2sd、cvttss2si、cvtss2sd、movd",
+      "易错": "源是有符号整数，把 CE 读到的无符号地址当成有符号转换会变负数。"
+    },
+    "cvttss2si": {
+      "功能": "带截断的标量单精度浮点转有符号整数（向零取整，不做四舍五rounding）。",
+      "语法": "cvttss2si r32/r64, xmm/m32",
+      "示例": "cvttss2si eax,xmm0",
+      "约束": "溢出或 NaN 返回「整数不确定值」（0x80000000）；不改变标志位。",
+      "相关": "cvtss2si、cvtsi2ss、cvttsd2si",
+      "易错": "负数会被截断而非向下取整；转换前需检查范围，否则拿到 0x80000000 很难查。"
+    },
+    "[ENABLE]": {
+      "功能": "CE 表脚本的启用段起点：启用脚本时执行这一段（分配内存、写入 Hook、注册符号）。",
+      "语法": "[ENABLE] 单独占一行，其后到 [DISABLE] 之前是启用代码",
+      "示例": "[ENABLE]\nalloc(newmem,2048)\nlabel(returnhere)\n...\n[DISABLE]\ndealloc(newmem)",
+      "约束": "每个表脚本只能有一个 [ENABLE]；其中 alloc 与 [DISABLE] 里的 dealloc 必须对应。",
+      "相关": "[DISABLE]、alloc、dealloc、registersymbol、aobscanmodule",
+      "易错": "只在 [ENABLE] 里注册符号却不在 [DISABLE] 里注销，重复启用会残留符号与内存泄漏。",
+      "AA 语境": "默认模板里的 newmem 是 CE 内置变量名，脚本生成配套代码时不要对它重复 alloc/label/registersymbol。"
+    },
+    "[DISABLE]": {
+      "功能": "CE 表脚本的禁用段起点：取消勾选时执行这一段（还原原始字节、释放内存、注销符号）。",
+      "语法": "[DISABLE] 单独占一行，位于 [ENABLE] 段之后",
+      "示例": "[DISABLE]\ndealloc(newmem)\nunregistersymbol(mySymbol)\n原地址:\ndb 原始字节",
+      "约束": "还原代码必须写回原始机器码字节；dealloc 的名称要与 [ENABLE] 的 alloc 一致。",
+      "相关": "[ENABLE]、dealloc、unregistersymbol、readmem、db",
+      "易错": "禁用段里漏掉还原原始字节，取消勾选后游戏仍执行注入代码导致崩溃；db 的字节串要与 AOBScan 定位到的原指令完全一致。"
+    },
+    "{$lua}": {
+      "功能": "在 Auto Assembler 脚本中切换到 Lua 代码块，成对使用可嵌入任意 Lua 逻辑（如动态算地址、写日志）。",
+      "语法": "{$lua}\n... Lua 代码 ...\n{$asm} 或 {$lua} 结束",
+      "示例": "{$lua}\nprint(getCEVersion())\n{$asm}",
+      "约束": "Lua 块内不能直接写汇编指令；块内定义的局部变量在 {$asm} 块中不可见，需通过全局或 registerSymbol 传递。",
+      "相关": "{$asm}、{$ccode}、luacall、autoAssemble、[ENABLE]",
+      "易错": "忘记写结束标记会把后续汇编当成 Lua 解析；在 Lua 块里调用 autoAssemble 会形成嵌套执行。"
+    },
+    "{$asm}": {
+      "功能": "从 Lua/C 代码块切回 Auto Assembler 语法，或标记汇编代码块开始。",
+      "语法": "{$asm}\n... AA 代码 ...",
+      "示例": "{$lua}\nlocal a = 0x123456\n{$asm}\nalloc(newmem,2048)",
+      "约束": "与 {$lua} 成对使用；切换后按 AA 规则解析。",
+      "相关": "{$lua}、{$ccode}、[ENABLE]",
+      "易错": "Lua 块与汇编块之间数据不共享，需在 Lua 块里把地址写入符号再在 AA 块引用。"
+    },
+    "{$ccode}": {
+      "功能": "在 AA 脚本中嵌入 C 代码块，由 CE 内置编译器编译成机器码。",
+      "语法": "{$ccode}\n... C 代码 ...\n{$asm}",
+      "示例": "{$ccode}\nint addone(int a) { return a + 1; }\n{$asm}",
+      "约束": "需指定目标位数（32/64）；C 代码内的地址/调用约定要与目标进程一致；CE 会为函数分配内存。",
+      "相关": "{$CODE}、{$STDCALL}、{$asm}、createthread",
+      "易错": "C 代码里直接访问游戏地址需要显式指针与类型转换；跨位数的指针长度写错会崩溃。"
+    },
+    "alloc": {
+      "功能": "在目标进程中分配一块可读可写可执行的内存，并把地址绑定到符号，供注入代码使用。",
+      "语法": "alloc(名称, 字节数) 或 alloc(名称, 字节数, 首选地址)",
+      "示例": "alloc(newmem,2048) / alloc(cave,256,\"game.exe\"+1000)",
+      "约束": "名称在同一脚本内唯一；大小应足够容纳注入代码与数据；对应 [DISABLE] 中要 dealloc。",
+      "相关": "dealloc、globalalloc、label、registersymbol、aobscanmodule、readmem",
+      "易错": "分配过小导致写入越界；重复启用脚本时同名符号冲突；在 [DISABLE] 漏掉 dealloc 造成内存泄漏。",
+      "AA 语境": "newmem 是 CE 默认模板自带的内置变量名，用户模板与配套代码生成不应再对 newmem 重复 alloc/label/registersymbol/dealloc。"
+    },
+    "dealloc": {
+      "功能": "释放 alloc 分配的内存，通常在 [DISABLE] 段执行。",
+      "语法": "dealloc(名称)",
+      "示例": "dealloc(newmem)",
+      "约束": "名称必须是本脚本 alloc 过的；释放后该地址上的符号失效；注入代码仍在运行时释放会崩溃。",
+      "相关": "alloc、unregistersymbol、[DISABLE]、globalalloc",
+      "易错": "顺序问题：应先还原原始字节并确认没有线程还在执行注入代码，再 dealloc；对 globalalloc 分配的内存不要 dealloc。"
+    },
+    "globalalloc": {
+      "功能": "分配一块全局内存：同名内存已存在则复用而不重复分配，适合跨脚本共享数据。",
+      "语法": "globalalloc(名称, 字节数)",
+      "示例": "globalalloc(sharedBuf,64)",
+      "约束": "同名内存被多个脚本共用；不会在 [DISABLE] 自动释放；大小以第一次分配为准。",
+      "相关": "alloc、sharedalloc、dealloc、registersymbol",
+      "易错": "误以为禁用脚本会释放它；多个脚本用同一名字但期望不同大小会互相影响。"
+    },
+    "label": {
+      "功能": "声明一个标签（符号），使其可作为跳转目标或在脚本内引用某地址。",
+      "语法": "label(名称)",
+      "示例": "label(returnhere) / label(exit) ... jmp exit ... exit:",
+      "约束": "名称需在脚本内定义（用 名称: 定义或赋值）；仅声明不使用不影响生成。",
+      "相关": "alloc、registersymbol、jmp、jcc、define",
+      "易错": "声明了标签却没有在代码中定义实际位置，汇编时会报未定义符号；标签名与寄存器名冲突会造成解析歧义。"
+    },
+    "registersymbol": {
+      "功能": "把脚本内符号注册为全局符号，使地址列表、其他脚本或 Lua 代码可以按名字引用该地址。",
+      "语法": "registersymbol(名称)",
+      "示例": "registersymbol(playerBase) / registersymbol(newmem)",
+      "约束": "名称必须已在脚本中定义（alloc/label/aobscan 等）；[DISABLE] 中应 unregistersymbol。",
+      "相关": "unregistersymbol、label、alloc、aobscan、getAddress",
+      "易错": "重复启用脚本会因符号已存在而报错；注销时名字写错会留下悬空全局符号。",
+      "AA 语境": "newmem 若由 CE 默认模板处理，配套代码生成不要再对它注册一次。"
+    },
+    "unregistersymbol": {
+      "功能": "注销此前注册的全局符号。",
+      "语法": "unregistersymbol(名称)",
+      "示例": "unregistersymbol(playerBase)",
+      "约束": "仅注销符号名，不释放内存；与 dealloc 是两件事。",
+      "相关": "registersymbol、dealloc、[DISABLE]",
+      "易错": "以为 unregistersymbol 会释放 alloc 的内存（需另外 dealloc）；顺序上通常先注销再释放。"
+    },
+    "define": {
+      "功能": "定义编译期常量/宏，把名称替换为值，用于集中管理地址与偏移。",
+      "语法": "define(名称, 值)",
+      "示例": "define(PLAYER_BASE,\"game.exe\"+1A2B3C) / mov eax,[PLAYER_BASE]",
+      "约束": "替换发生在汇编阶段，不占用运行时内存；名称在脚本内唯一。",
+      "相关": "label、alloc、aobscanmodule、{$lua}",
+      "易错": "把会变化的运行时值写成 define；值里的引号与加号语法容易写错，模块偏移应写成 \"模块.exe\"+偏移。"
+    },
+    "aobscan": {
+      "功能": "在整个进程内存中搜索字节特征串（Array Of Bytes），把命中地址绑定到符号。",
+      "语法": "aobscan(名称, 字节串)",
+      "示例": "aobscan(hookAddr,8B 45 08 89 45 FC)",
+      "约束": "特征串必须唯一命中，多个结果会报错；可用 ?? 通配；跨模块全内存扫描较慢。",
+      "相关": "aobscanmodule、aobscanregion、define、assert、readmem",
+      "易错": "特征串包含会随版本变化的相对偏移/地址，游戏更新后失效；命中不唯一导致脚本启用失败，应优先用 aobscanmodule 限定模块。"
+    },
+    "aobscanmodule": {
+      "功能": "只在指定模块内存范围内搜索字节特征串，比全局 aobscan 更快、更不易误命中。",
+      "语法": "aobscanmodule(名称, 模块名, 字节串)",
+      "示例": "aobscanmodule(hookAddr,game.exe,48 8B 05 ?? ?? ?? ?? 48 85 C0)",
+      "约束": "模块必须已加载；特征串用 ?? 通配易变字节；命中需唯一。",
+      "相关": "aobscan、aobscanregion、define、readmem、[ENABLE]",
+      "易错": "模块名要写实际文件名（含 .exe/.dll）；把相对跳转的偏移字节也写进特征串会导致版本更新后失效；未命中时脚本启用失败，可用 {$lua} + assert 给出提示。",
+      "AA 语境": "定位到注入点后，通常配合 alloc + jmp + originalcode/returnhere 标签；记录原字节到 [DISABLE] 用于还原。"
+    },
+    "aobscanregion": {
+      "功能": "在指定的地址区间内搜索字节特征串。",
+      "语法": "aobscanregion(名称, 起始地址, 结束地址, 字节串)",
+      "示例": "aobscanregion(hit,00400000,00A00000,8B 45 ?? 89)",
+      "约束": "区间必须落在已提交内存；起始/结束可写符号或表达式。",
+      "相关": "aobscan、aobscanmodule、define",
+      "易错": "地址写死会随 ASLR 失效，建议用模块基址加偏移表达区间。"
+    },
+    "assert": {
+      "功能": "汇编期断言：检查某地址处的字节是否符合预期，不符合就中止脚本启用。",
+      "语法": "assert(地址, 字节串)",
+      "示例": "assert(hookAddr,8B 45 08 89 45 FC)",
+      "约束": "在启用阶段求值，不生成运行时代码；地址必须有效可读。",
+      "相关": "aobscanmodule、readmem、[ENABLE]、db",
+      "易错": "断言写的是「期望的原字节」，不是新写入的字节；忘记断言时游戏版本变化可能把补丁打到错误位置。"
+    },
+    "createthread": {
+      "功能": "在当前脚本内分配的地址处创建一个线程执行注入代码，常用于一次性初始化逻辑。",
+      "语法": "createthread(符号) 或 createthread(地址)",
+      "示例": "createthread(initCode) / createthreadandwait(initCode)",
+      "约束": "线程代码必须以 ret 结束；需要遵守调用约定与栈对齐；线程内访问的地址必须已分配。",
+      "相关": "createthreadandwait、loadlibrary、call、{$ccode}",
+      "易错": "线程函数忘了 ret 会跑飞；异步线程与脚本启用段竞争，需要等待时用 createthreadandwait。"
+    },
+    "createthreadandwait": {
+      "功能": "创建线程并等待其执行结束再继续脚本，保证初始化顺序。",
+      "语法": "createthreadandwait(符号)",
+      "示例": "createthreadandwait(initCode)",
+      "约束": "线程内若死循环会阻塞 CE；线程代码必须 ret。",
+      "相关": "createthread、call、sleep",
+      "易错": "在线程里等待主线程资源会死锁；不要用它执行长时间循环。"
+    },
+    "loadlibrary": {
+      "功能": "让目标进程加载指定 DLL，常配合 createthread 调用外部库函数。",
+      "语法": "loadlibrary(路径) 或 loadlibrary(路径, 符号)",
+      "示例": "loadlibrary(\"C:\\mods\\helper.dll\")",
+      "约束": "路径要写目标进程可见的绝对路径；DLL 位数必须与目标进程一致。",
+      "相关": "createthread、call、include",
+      "易错": "DLL 位数不匹配会加载失败；路径中的反斜杠要正确转义。"
+    },
+    "luacall": {
+      "功能": "在 AA 脚本中调用 Lua 函数，把返回值作为数值/字符串参与汇编。",
+      "语法": "luacall(函数名(参数...))",
+      "示例": "luacall(getMyAddress()) / mov eax,luacall(getBase())",
+      "约束": "Lua 函数需在脚本或 CE 环境中已定义；返回值类型要能转成整数。",
+      "相关": "{$lua}、autoAssemble、define、include",
+      "易错": "函数名拼写错误会在启用阶段报错；返回字符串需能被解析成地址表达式。"
+    },
+    "readmem": {
+      "功能": "把某地址处的一段原始字节复制到当前代码位置，常用于保留原指令以便 [DISABLE] 还原。",
+      "语法": "readmem(地址, 字节数)",
+      "示例": "readmem(originalAddr,5) / originalcode:\nreadmem(hookAddr,6)",
+      "约束": "在汇编阶段读取目标进程内存，地址必须有效；字节数要与被覆盖的指令长度一致。",
+      "相关": "assert、aobscanmodule、db、[DISABLE]",
+      "易错": "字节数算错会截断原指令；地址写成注入后的新地址会读到自己写入的补丁字节。"
+    },
+    "db": {
+      "功能": "定义字节（Define Byte）：直接在当前位置写入一个或多个原始字节。",
+      "语法": "db 字节串（十六进制，空格分隔）",
+      "示例": "db 90 90 90 / db 8B 45 08 89 45 FC",
+      "约束": "每个值 0..255；按写入顺序排列；总长度要与被覆盖区域一致。",
+      "相关": "dw、dd、dq、nop、readmem、[DISABLE]",
+      "易错": "用 db 还原原指令时字节数不足/超出会破坏后续指令；十六进制别写成十进制。"
+    },
+    "dw": {
+      "功能": "定义 16 位字（2 字节，小端序）。",
+      "语法": "dw 值[, 值...]",
+      "示例": "dw 1234 / dw 0x1234,0x5678",
+      "约束": "值 0..0xFFFF；按小端写入。",
+      "相关": "db、dd、dq、align",
+      "易错": "CE 中数值多为小端，手写 1234 会写成 34 12。"
+    },
+    "dd": {
+      "功能": "定义 32 位双字（4 字节，小端序），常用来放地址或浮点位模式。",
+      "语法": "dd 值[, 值...]",
+      "示例": "dd (float)1.0 / dd 00401000 / dd 0",
+      "约束": "值 0..0xFFFFFFFF；可用 (float)/(double) 转换；按小端写入。",
+      "相关": "db、dw、dq、align、define",
+      "易错": "32 位地址写进 64 位脚本会截断；浮点要用 (float) 显式转换而不是直接写 1.0。"
+    },
+    "dq": {
+      "功能": "定义 64 位四字（8 字节，小端序）。",
+      "语法": "dq 值[, 值...]",
+      "示例": "dq 0 / dq (double)1.5",
+      "约束": "64 位值；可用 (double) 转换；按小端写入。",
+      "相关": "db、dw、dd、align",
+      "易错": "与 movsd/movsq 的「8 字节」概念不同：dq 是数据定义，后者是指令。"
+    },
+    "align": {
+      "功能": "把当前代码/数据位置对齐到指定字节边界，用 nop 或 0 填充。",
+      "语法": "align 边界值",
+      "示例": "align 16",
+      "约束": "边界值应为 2 的幂；填充会影响后续地址，标签位置随之改变。",
+      "相关": "db、times、nop、movdqa",
+      "易错": "在需要精确地址的地方插入 align 会打乱偏移；SSE 对齐数据用 align 16 配合 movdqa。"
+    },
+    "fullaccess": {
+      "功能": "把指定内存页改为可读可写可执行（RWX），用于改写受保护的代码段。",
+      "语法": "fullaccess(地址, 字节数)",
+      "示例": "fullaccess(hookAddr,16)",
+      "约束": "会修改页面保护属性；需要足够权限；可能触发反作弊检测。",
+      "相关": "unprotect、alloc、VirtualProtect、aobscanmodule",
+      "易错": "永久改变保护属性、未恢复；现代游戏常有代码完整性校验，滥用易被检测。"
+    },
+    "unprotect": {
+      "功能": "临时移除指定内存区域的写保护，使脚本可以改写只读代码页。",
+      "语法": "unprotect(地址, 字节数)",
+      "示例": "unprotect(hookAddr,5)",
+      "约束": "影响整个内存页；仅在启用阶段有效；某些 CE 版本已由自动汇编自动处理。",
+      "相关": "fullaccess、alloc、readmem",
+      "易错": "与 fullaccess 作用范围不同；写入前要确认长度跨了几个页。"
+    },
+    "struct": {
+      "功能": "定义结构体布局，便于按字段名和偏移访问目标进程的数据结构。",
+      "语法": "struct 名称\n字段: 类型\nendstruct",
+      "示例": "struct Player\nhealth: dd\nname: db 32\nendstruct",
+      "约束": "字段名唯一；成员类型用 db/dw/dd/dq 等；偏移按定义顺序累加（注意对齐）。",
+      "相关": "endstruct、db/dd/dq、define",
+      "易错": "结构体对齐与实际 C/C++ 结构不一致时偏移算错；跨位数指针长度不同需分别定义。"
+    },
+    "endstruct": {
+      "功能": "结束 struct 定义。",
+      "语法": "endstruct（无参数）",
+      "示例": "struct Player\nhealth: dd\nendstruct",
+      "约束": "必须与 struct 成对出现。",
+      "相关": "struct、db/dd/dq",
+      "易错": "漏写 endstruct 会把后续 AA 代码解析成结构体字段。"
+    },
+    "kalloc": {
+      "功能": "在内核空间分配内存（需要内核模式驱动/DBK 支持）。",
+      "语法": "kalloc(名称, 字节数)",
+      "示例": "kalloc(kbuf,256)",
+      "约束": "需要 CE 内核模式访问可用；普通用户态脚本无法使用；风险较高。",
+      "相关": "alloc、globalalloc",
+      "易错": "在普通脚本里误用会启用失败；内核地址任意写入可导致系统蓝屏。"
+    },
+    "reassemble": {
+      "功能": "把指定地址处的机器码反汇编后重新汇编写入，常用于修正相对跳转偏移。",
+      "语法": "reassemble(地址)",
+      "示例": "reassemble(hookAddr)",
+      "约束": "地址处必须是完整指令；重新汇编会改变指令长度与相对偏移。",
+      "相关": "readmem、aobscanmodule、jmp、db",
+      "易错": "对数据区使用会得到无意义指令；重汇编后原字节变化会影响 [DISABLE] 的还原串。"
+    },
+    "autoAssemble": {
+      "功能": "在 Lua 中执行一段 Auto Assembler 脚本，返回是否成功；是 Lua 侧驱动内存补丁的主要方式。",
+      "语法": "ok = autoAssemble(scriptText, targetSelf?)",
+      "示例": "local ok = autoAssemble([[alloc(x,64)\nregistersymbol(x)]])",
+      "约束": "脚本需自带 [ENABLE] 或按注入语法书写；失败时返回 false/nil，可用 errorOnFailure 或 checkSyntax 先校验。",
+      "相关": "AOBScan、registerSymbol、getAddress、{$lua}、[ENABLE]",
+      "易错": "在 {$lua} 块内再调用 autoAssemble 会嵌套执行；脚本里的引号/换行要用 Lua 长字符串 [[]] 包住；失败不检查会静默无效。"
+    },
+    "AOBScan": {
+      "功能": "在目标进程内存中按字节特征串搜索，返回找到的地址列表（或 nil）。",
+      "语法": "result = AOBScan(\"48 8B 05 ?? ?? ?? ??\") 或 AOBScan(pattern, protectionflags, alignmenttype, alignmentparam)",
+      "示例": "local r = AOBScan(\"8B 45 08\"); if r then print(r[0]) end",
+      "约束": "返回的是 StringList（索引从 0 开始），用完应 destroy；特征串可用 ?? 或 * 通配；未命中返回 nil。",
+      "相关": "AOBScanModule、AOBScanUnique、aobscanmodule、autoAssemble",
+      "易错": "用 r[1] 取第一个结果（应为 r[0]）；忘记 r.destroy() 造成资源泄漏；不判断 nil 直接索引会报错。"
+    },
+    "AOBScanModule": {
+      "功能": "只在指定模块范围内做 AOB 扫描，速度更快、误命中更少。",
+      "语法": "result = AOBScanModule(\"game.exe\", \"48 8B ?? ??\")",
+      "示例": "local r = AOBScanModule(\"game.exe\", \"8B 45 08 89 45 FC\")",
+      "约束": "模块名必须是已加载模块的实际名称；返回值同 AOBScan。",
+      "相关": "AOBScan、AOBScanUnique、aobscanmodule、getAddress",
+      "易错": "模块名大小写/后缀写错；结果多个时未判断 r.Count 就取 r[0] 会拿到非预期地址。"
+    },
+    "readInteger": {
+      "功能": "从目标进程指定地址读取 32 位有符号整数。",
+      "语法": "value = readInteger(address) 或 readInteger(\"symbol+offset\")",
+      "示例": "local hp = readInteger(\"game.exe\"+0x1A2B3C)",
+      "约束": "地址可读，否则返回 nil；返回有符号 32 位值；64 位整数用 readQword。",
+      "相关": "writeInteger、readQword、readFloat、readPointer、readBytes",
+      "易错": "把无符号值（如 0xFFFFFFFF）读成 -1；地址写成字符串时要用 \"+\" 拼接表达式。"
+    },
+    "writeInteger": {
+      "功能": "向目标进程指定地址写入 32 位整数。",
+      "语法": "writeInteger(address, value)",
+      "示例": "writeInteger(\"playerBase\"+0x10, 999)",
+      "约束": "地址必须可写；值超 32 位会被截断；写入前可能需要 unprotect/fullaccess。",
+      "相关": "readInteger、writeQword、writeBytes、writeFloat、allocateMemory",
+      "易错": "写入只读代码页会失败；不检查返回值；把浮点值直接写成整数会丢小数。"
+    },
+    "readBytes": {
+      "功能": "从目标进程读取一段原始字节，返回字节表；常用来备份原指令。",
+      "语法": "bytes = readBytes(address, count, returnAsTable?)",
+      "示例": "local t = readBytes(0x401000, 5, true)",
+      "约束": "返回表的索引从 1 开始（Lua 习惯）；count 过大有性能开销；地址不可读时返回 nil。",
+      "相关": "writeBytes、readmem、readInteger、readPointer",
+      "易错": "与 CE 其他 API 的 0 基索引混淆；true 参数漏写时返回的是多个返回值而不是表。"
+    },
+    "writeBytes": {
+      "功能": "向目标进程写入一串原始字节，常用于打补丁和还原。",
+      "语法": "writeBytes(address, 0x90, 0x90, ...) 或 writeBytes(address, byteTable)",
+      "示例": "writeBytes(hookAddr, 0xE9, 0x00, 0x00, 0x00, 0x00)",
+      "约束": "地址必须可写；字节值 0..255；相对跳转的 4 字节位移要按小端手工计算。",
+      "相关": "readBytes、readmem、db、writeInteger、fullaccess",
+      "易错": "E9 jmp 的位移 = 目标 - (当前地址 + 5)，写错会跳飞；覆盖多字节指令时长度不匹配会留下半条指令。"
+    },
+    "readFloat": {
+      "功能": "读取 32 位单精度浮点数。",
+      "语法": "value = readFloat(address)",
+      "示例": "local speed = readFloat(\"playerBase\"+0x4C)",
+      "约束": "返回 Lua number；地址不可读返回 nil；精度约 7 位有效数字。",
+      "相关": "writeFloat、readDouble、readInteger",
+      "易错": "把 double 地址用 readFloat 读会得到完全错误的值；先确认游戏里该字段是 float 还是 double。"
+    },
+    "writeFloat": {
+      "功能": "写入 32 位单精度浮点数。",
+      "语法": "writeFloat(address, value)",
+      "示例": "writeFloat(\"playerBase\"+0x4C, 3.5)",
+      "约束": "值会被转成 float 精度；地址必须可写。",
+      "相关": "readFloat、writeDouble、writeInteger",
+      "易错": "把整数地址写成浮点；写 NaN/Inf 会让游戏逻辑异常。"
+    },
+    "readDouble": {
+      "功能": "读取 64 位双精度浮点数。",
+      "语法": "value = readDouble(address)",
+      "示例": "local t = readDouble(\"timerBase\")",
+      "约束": "地址不可读返回 nil；8 字节对齐非必需但建议。",
+      "相关": "writeDouble、readFloat、readQword",
+      "易错": "与 float 混用；Lua number 本身是 double，多数计时/坐标字段是 float。"
+    },
+    "writeDouble": {
+      "功能": "写入 64 位双精度浮点数。",
+      "语法": "writeDouble(address, value)",
+      "示例": "writeDouble(\"timerBase\", 1.25)",
+      "约束": "会写 8 字节，可能覆盖相邻字段；地址必须可写。",
+      "相关": "readDouble、writeFloat、writeQword",
+      "易错": "原本是 float 的字段写 double 会覆盖紧随其后的 4 字节数据。"
+    },
+    "readString": {
+      "功能": "从目标进程读取字符串（ANSI 或 UTF-16，取决于参数）。",
+      "语法": "text = readString(address, maxLength, isUnicode?)",
+      "示例": "local name = readString(\"playerBase\"+0x20, 32, true)",
+      "约束": "maxLength 是字符数上限；地址不可读或未遇 0 终止符可能返回超长内容；Unicode 参数要与游戏编码一致。",
+      "相关": "writeString、readBytes、readInteger",
+      "易错": "忘记第三个参数导致中文/Unicode 名称乱码；maxLength 给太小会截断。"
+    },
+    "writeString": {
+      "功能": "向目标进程写入字符串。",
+      "语法": "writeString(address, text, isUnicode?)",
+      "示例": "writeString(\"nameAddr\", \"Player\", false)",
+      "约束": "会写入末尾 0；长度不能超过分配空间；Unicode 参数需匹配目标缓冲区编码。",
+      "相关": "readString、writeBytes、allocateMemory",
+      "易错": "写入超过原缓冲区长度会覆盖相邻内存导致崩溃；Unicode 字符串字节数是字符数的 2 倍。"
+    },
+    "readPointer": {
+      "功能": "读取指针并按偏移链逐级解引用，返回最终地址或该地址处的值。",
+      "语法": "value = readPointer(base, offset1, offset2, ...)",
+      "示例": "local hp = readPointer(\"game.exe\"+0x1A2B3C, 0x10, 0x28)",
+      "约束": "中间任一级为无效地址/0 会失败并返回 nil；每级偏移按目标位数对齐。",
+      "相关": "readInteger、writeInteger、getAddress、AOBScanModule",
+      "易错": "偏移顺序写反；某一级指针为 0 时未判空直接继续解引用；CE 地址列表里的偏移顺序与代码顺序需一致。"
+    },
+    "allocateMemory": {
+      "功能": "在目标进程中分配内存并返回地址，供 Lua 侧写入数据或代码。",
+      "语法": "addr = allocateMemory(size)",
+      "示例": "local buf = allocateMemory(256)",
+      "约束": "返回的数值地址需用 deAlloc/deallocateMemory 释放；分配的内存默认可读写；大小按字节。",
+      "相关": "deAlloc、writeBytes、autoAssemble、alloc",
+      "易错": "忘记释放造成泄漏；与 AA 的 alloc 是两套机制，符号不互通。"
+    },
+    "showMessage": {
+      "功能": "弹出一个消息框，用于脚本调试与提示。",
+      "语法": "showMessage(text)",
+      "示例": "showMessage(\"AOB 未找到，请检查游戏版本\")",
+      "约束": "模态阻塞，会暂停 Lua 执行；不适合放在定时器/循环里频繁调用。",
+      "相关": "print、sleep、createTimer",
+      "易错": "在高频回调里弹窗会卡住 CE；拼接数值要用 tostring() 或 .. 显式转换。"
+    },
+    "sleep": {
+      "功能": "让当前 Lua 执行暂停指定毫秒数。",
+      "语法": "sleep(milliseconds)",
+      "示例": "sleep(100)",
+      "约束": "在主线程调用会冻结 CE 界面；定时器回调里可用；不保证精确时序。",
+      "相关": "createTimer、showMessage、createthreadandwait",
+      "易错": "在主线程里 sleep 数秒导致界面假死；轮询等待应改用定时器加状态判断。"
+    },
+    "createTimer": {
+      "功能": "创建定时器对象，按 Interval 周期性触发 OnTimer 回调。",
+      "语法": "t = createTimer(owner?) ; t.Interval = 100 ; t.OnTimer = function() ... end ; t.Enabled = true",
+      "示例": "local t = createTimer(nil); t.Interval = 100; t.OnTimer = function() print(readInteger(addr)) end; t.Enabled = true",
+      "约束": "回调在主线程执行，不能做耗时操作；用完 t.destroy()；Enabled 默认为 false。",
+      "相关": "sleep、readInteger、showMessage",
+      "易错": "忘记设 Enabled = true 导致回调不执行；回调里 sleep 或弹窗会卡界面；多个定时器未销毁会越跑越慢。"
+    },
+    "getAddressList": {
+      "功能": "返回 CE 地址列表对象，可遍历/添加内存记录。",
+      "语法": "al = getAddressList() ; mr = al.getMemoryRecord(index)",
+      "示例": "local al = getAddressList(); print(al.Count)",
+      "约束": "内存记录索引从 0 开始；返回对象随表生命周期有效。",
+      "相关": "getMemoryRecordByID、getAddress、registerSymbol",
+      "易错": "用 1 作为第一个索引；在表未加载时访问 Count 报错。"
+    },
+    "openProcess": {
+      "功能": "按进程名或 PID 打开目标进程，使后续读写 API 生效。",
+      "语法": "openProcess(\"game.exe\") 或 openProcess(pid)",
+      "示例": "openProcess(\"game.exe\")",
+      "约束": "需要足够权限；进程不存在会失败；对受保护进程可能被拒绝。",
+      "相关": "getOpenedProcessID、readInteger、AOBScanModule",
+      "易错": "没打开进程就读写会得到 nil；进程名要与任务管理器中的映像名一致。"
+    },
+    "getCEVersion": {
+      "功能": "返回当前 Cheat Engine 的版本号（数值）。",
+      "语法": "v = getCEVersion()",
+      "示例": "if getCEVersion() >= 7.5 then ... end",
+      "约束": "返回数值，比较时用数值；不同版本可用 API 集合不同。",
+      "相关": "autoAssemble、targetIs64Bit",
+      "易错": "把版本当字符串比较；据此判断 API 可用性时还要考虑 CE 分支版本。"
+    },
+    "getAddress": {
+      "功能": "把符号名或「模块+偏移」表达式解析成数值地址。",
+      "语法": "addr = getAddress(\"game.exe\"+0x1000) 或 getAddress(\"mySymbol\")",
+      "示例": "local a = getAddress(\"playerBase\")",
+      "约束": "符号必须先注册；模块需已加载；解析失败返回 0 或 nil。",
+      "相关": "registerSymbol、readPointer、AOBScanModule、define",
+      "易错": "把字符串 \"game.exe+1000\" 传入（应为 \"game.exe\"+0x1000 表达式）；未注册的符号返回 0 被误当成有效地址。"
+    },
+    "registerSymbol": {
+      "功能": "在 Lua 侧注册全局符号，使地址列表与 AA 脚本可以按名字引用。",
+      "语法": "registerSymbol(name, address, dontSave?)",
+      "示例": "registerSymbol(\"playerBase\", 0x123456)",
+      "约束": "名称全局唯一；重复注册会覆盖或报错；注销用 unregisterSymbol。",
+      "相关": "unregisterSymbol、getAddress、registersymbol、autoAssemble",
+      "易错": "与 AA 的 registersymbol 混用导致重复注册；地址写成字符串而非数值。"
+    },
+    "unregisterSymbol": {
+      "功能": "注销 Lua 侧注册的全局符号。",
+      "语法": "unregisterSymbol(name)",
+      "示例": "unregisterSymbol(\"playerBase\")",
+      "约束": "仅注销符号，不释放内存。",
+      "相关": "registerSymbol、getAddress、unregistersymbol",
+      "易错": "地址列表中仍引用该符号时会显示无效地址。"
+    },
+    "getOpenedProcessID": {
+      "功能": "返回当前 CE 已附加进程的 PID。",
+      "语法": "pid = getOpenedProcessID()",
+      "示例": "if getOpenedProcessID() == 0 then showMessage(\"未附加进程\") end",
+      "约束": "未附加时返回 0；重启游戏后 PID 会变。",
+      "相关": "openProcess、getAddress、AOBScanModule",
+      "易错": "把 PID 缓存下来长期使用，游戏重启后失效。"
+    },
+    "targetIs64Bit": {
+      "功能": "判断当前附加的目标进程是否为 64 位。",
+      "语法": "is64 = targetIs64Bit()",
+      "示例": "if targetIs64Bit() then mov rax,... else mov eax,... end",
+      "约束": "需已附加进程；脚本里据此选择寄存器宽度与指针大小。",
+      "相关": "getOpenedProcessID、autoAssemble、alloc",
+      "易错": "在 {$lua} 块里判断后没有把结果传回 AA 块；64 位脚本里用 4 字节偏移却写 8 字节指针。"
+    }
+  },
+  "groups": [
+    {
+      "names": [
+        "ja",
+        "jae",
+        "jb",
+        "jbe",
+        "jc",
+        "je",
+        "jg",
+        "jge",
+        "jl",
+        "jle",
+        "jna",
+        "jnae",
+        "jnb",
+        "jnbe",
+        "jnc",
+        "jne",
+        "jng",
+        "jnge",
+        "jnl",
+        "jnle",
+        "jno",
+        "jnp",
+        "jns",
+        "jnz",
+        "jo",
+        "jp",
+        "jpe",
+        "jpo",
+        "js",
+        "jz",
+        "jecxz",
+        "jrcxz"
+      ],
+      "功能": "条件跳转（jcc）：根据 EFLAGS 标志位决定是否跳到标签；{name} 是其中一条，条件由后缀决定。",
+      "语法": "{name} 标签",
+      "示例": "cmp eax,0 ; {name} label / test eax,eax ; {name} label",
+      "约束": "后缀含义：e/z 相等(ZF=1)、ne/nz 不相等；a/ae/b/be 无符号大于/大于等于/小于/小于等于；g/ge/l/le 有符号大于/大于等于/小于/小于等于；o/no 溢出、s/ns 符号、c/nc 进位、p/np 奇偶。短跳转范围 -128..127 字节。",
+      "相关": "cmp、test、jmp、setcc、cmovcc、loop",
+      "易错": "无符号比较必须用 a/b 系列、有符号比较必须用 g/l 系列，混用会在负数/大数值上判断反了；cmp 与跳转之间不要插入 add/and/test 等会改标志位的指令；jecxz/jrcxz 判断的是 ECX/RCX 是否为 0，与标志位无关。",
+      "AA 语境": "CE 注入代码里常用 cmp [addr],0 ; je exit 之类的分支；跳转目标要在同一 alloc 代码块内定义标签。"
+    },
+    {
+      "names": [
+        "seta",
+        "setae",
+        "setb",
+        "setbe",
+        "setc",
+        "sete",
+        "setg",
+        "setge",
+        "setl",
+        "setle",
+        "setna",
+        "setnae",
+        "setnb",
+        "setnbe",
+        "setnc",
+        "setne",
+        "setng",
+        "setnge",
+        "setnl",
+        "setnle",
+        "setno",
+        "setnp",
+        "setns",
+        "setnz",
+        "seto",
+        "setp",
+        "setpe",
+        "setpo",
+        "sets",
+        "setz"
+      ],
+      "功能": "按条件置字节（setcc）：条件成立则把 8 位操作数置 1，否则置 0，用于无分支地把布尔结果写入寄存器/内存。",
+      "语法": "{name} r/m8",
+      "示例": "cmp eax,ebx ; {name} al ; movzx eax,al",
+      "约束": "只写 1 字节；不改变标志位；常配合 movzx 把结果扩成 32/64 位。",
+      "相关": "cmp、test、jcc、cmovcc、movzx",
+      "易错": "只写低 8 位，其余位保持不变，需要先 xor eax,eax 或 movzx；别把 setcc 当成跳转使用。"
+    },
+    {
+      "names": [
+        "cmova",
+        "cmovae",
+        "cmovb",
+        "cmovbe",
+        "cmovc",
+        "cmove",
+        "cmovg",
+        "cmovge",
+        "cmovl",
+        "cmovle",
+        "cmovna",
+        "cmovnae",
+        "cmovnb",
+        "cmovnbe",
+        "cmovnc",
+        "cmovne",
+        "cmovng",
+        "cmovnge",
+        "cmovnl",
+        "cmovnle",
+        "cmovno",
+        "cmovnp",
+        "cmovns",
+        "cmovnz",
+        "cmovo",
+        "cmovp",
+        "cmovpe",
+        "cmovpo",
+        "cmovs",
+        "cmovz"
+      ],
+      "功能": "条件传送（cmovcc）：条件成立则把源拷入目的寄存器，否则目的保持不变，用于消除分支。",
+      "语法": "{name} 目的寄存器, 源（源可为内存）",
+      "示例": "cmp eax,ebx ; {name} eax,ecx",
+      "约束": "目的必须是寄存器；源不能是立即数；不改变标志位；无论条件是否成立，源内存都可能被读取。",
+      "相关": "cmp、test、jcc、setcc、mov",
+      "易错": "源是可能无效的内存地址时，即使条件不成立也可能触发访问违例；不能以它替代需要短路求值的安全检查。"
+    },
+    {
+      "names": [
+        "rax",
+        "rbx",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rdi",
+        "rbp",
+        "rsp",
+        "r8",
+        "r9",
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r15"
+      ],
+      "功能": "64 位通用寄存器，x86-64 模式可用；{name} 可作数据、地址与计数用途。",
+      "语法": "mov {name},值 / [{name}+偏移]（按寻址需要）",
+      "示例": "mov {name},[rbx+8]",
+      "约束": "rax 隐含乘除与返回值；rcx 是第 1 个整数参数与循环计数；rsp 为栈指针、rbp 为帧指针；r8-r15 需要 REX 前缀编码。",
+      "相关": "eax/ebx/ecx/edx/esi/edi/ebp/esp（低 32 位）、r8d/r8w/r8b、xmm0-15",
+      "易错": "写 32 位子寄存器（如 eax）会自动把 64 位寄存器高 32 位清零，写 8/16 位子寄存器则不会；在 32 位目标进程中不可用。",
+      "AA 语境": "64 位 CE 脚本里地址与指针都是 8 字节，Hook 时应改用 rax/rcx 等，偏移也要按 8 字节对齐。"
+    },
+    {
+      "names": [
+        "eax",
+        "ebx",
+        "ecx",
+        "edx",
+        "esi",
+        "edi",
+        "ebp",
+        "esp"
+      ],
+      "功能": "32 位通用寄存器；在 64 位模式下它们是对应 64 位寄存器的低 32 位。{name} 常用于 32 位游戏脚本。",
+      "语法": "mov {name},值 / [{name}+偏移]",
+      "示例": "mov {name},[esi+0x10]",
+      "约束": "eax 隐含乘除与函数返回值；ecx 为循环计数/第 1 个 fastcall 参数；esp 栈指针、ebp 帧指针；esp 不应作普通数据寄存器。",
+      "相关": "rax/rbx/rcx/rdx/rsi/rdi/rbp/rsp、ax/al/ah、xmm0",
+      "易错": "64 位模式下写 {name} 会清零对应 64 位寄存器的高 32 位；把 8 字节指针装进 32 位寄存器会被截断。"
+    },
+    {
+      "names": [
+        "al",
+        "bl",
+        "cl",
+        "dl",
+        "ah",
+        "bh",
+        "ch",
+        "dh",
+        "ax",
+        "bx",
+        "cx",
+        "dx",
+        "si",
+        "di",
+        "bp",
+        "sp",
+        "sil",
+        "dil",
+        "bpl",
+        "spl"
+      ],
+      "功能": "8/16 位子寄存器：al/ah/bl/bh/cl/ch/dl/dh 是 8 位，ax/bx/cx/dx/si/di/bp/sp 是 16 位；{name} 映射到对应通用寄存器的一部分。",
+      "语法": "mov {name},值 / cmp {name},0",
+      "示例": "mov {name},0xFF",
+      "约束": "写 8/16 位子寄存器只改对应位，其余位保留（与写 32 位不同）；cl 是移位计数的专用寄存器；ah 等高位字节在 64 位需要 REX 的指令中不可用。",
+      "相关": "eax/rax、movzx、movsx、cbw/cwde、shl/shr",
+      "易错": "写入后高位残留导致比较/运算结果异常，通常需要先 movzx 或 xor 整个寄存器；混用 ah 与需要 REX 前缀的指令会汇编失败。"
+    },
+    {
+      "names": [
+        "r8d",
+        "r9d",
+        "r10d",
+        "r11d",
+        "r12d",
+        "r13d",
+        "r14d",
+        "r15d",
+        "r8w",
+        "r9w",
+        "r10w",
+        "r11w",
+        "r12w",
+        "r13w",
+        "r14w",
+        "r15w",
+        "r8b",
+        "r9b",
+        "r10b",
+        "r11b",
+        "r12b",
+        "r13b",
+        "r14b",
+        "r15b"
+      ],
+      "功能": "扩展寄存器 r8-r15 的低 32/16/8 位视图：d=32 位、w=16 位、b=8 位；{name} 对应其中一个。",
+      "语法": "mov {name},值",
+      "示例": "mov {name},1",
+      "约束": "仅 64 位模式可用；写 d 形式会清零所在 64 位寄存器的高 32 位；w/b 形式只改对应位。",
+      "相关": "r8-r15、movzx、movsx、targetIs64Bit",
+      "易错": "32 位目标进程中不可用；与 rax..r15 的编码需要 REX 前缀，某些指令组合不被允许。"
+    },
+    {
+      "names": [
+        "xmm0",
+        "xmm1",
+        "xmm2",
+        "xmm3",
+        "xmm4",
+        "xmm5",
+        "xmm6",
+        "xmm7",
+        "xmm8",
+        "xmm9",
+        "xmm10",
+        "xmm11",
+        "xmm12",
+        "xmm13",
+        "xmm14",
+        "xmm15"
+      ],
+      "功能": "128 位 SSE 向量寄存器，可存放 4 个 float、2 个 double 或整数向量；{name} 是其中一个。",
+      "语法": "movaps {name},[addr] / movd {name},eax / pxor {name},{name}",
+      "示例": "movss {name},dword ptr [esi]",
+      "约束": "16 字节对齐指令（movaps/movdqa）要求地址对齐；xmm0 在 Windows x64 浮点调用约定中是第 1 个浮点参数与返回值；xmm6-xmm15 在部分约定中需保存。",
+      "相关": "ymm0-15、zmm0-31、movss/movsd、addps、pxor、vzeroupper",
+      "易错": "注入代码里覆盖 xmm0 而未保存会破坏原程序浮点状态；混用 AVX 与 SSE 未执行 vzeroupper 会带来性能惩罚。"
+    },
+    {
+      "names": [
+        "ymm0",
+        "ymm1",
+        "ymm2",
+        "ymm3",
+        "ymm4",
+        "ymm5",
+        "ymm6",
+        "ymm7",
+        "ymm8",
+        "ymm9",
+        "ymm10",
+        "ymm11",
+        "ymm12",
+        "ymm13",
+        "ymm14",
+        "ymm15",
+        "zmm0",
+        "zmm1",
+        "zmm2",
+        "zmm3",
+        "zmm4",
+        "zmm5",
+        "zmm6",
+        "zmm7",
+        "zmm8",
+        "zmm9",
+        "zmm10",
+        "zmm11",
+        "zmm12",
+        "zmm13",
+        "zmm14",
+        "zmm15"
+      ],
+      "功能": "256 位 AVX（ymm）或 512 位 AVX-512（zmm）向量寄存器；{name} 的低 128 位与同名 XMM 寄存器重叠。",
+      "语法": "vmovaps {name},[addr] / vaddps {name},{name},[addr]",
+      "示例": "vxorps {name},{name},{name}",
+      "约束": "需要 CPU 与 OS 支持对应指令集（AVX 需 XGETBV 检查 OSXSAVE）；ymm 对齐指令要求 32 字节对齐；使用前最好用 cpuid 检测。",
+      "相关": "xmm0-15、vzeroupper、vmovaps、cpuid",
+      "易错": "目标 CPU 不支持时执行会 #UD；写 ymm 会覆盖对应 xmm 的高位，混用要 vzeroupper；地址对齐不满足会 #GP。"
+    },
+    {
+      "names": [
+        "byte",
+        "word",
+        "dword",
+        "qword",
+        "tbyte",
+        "oword",
+        "xmmword",
+        "ymmword",
+        "zmmword",
+        "ptr"
+      ],
+      "功能": "尺寸/指针修饰符，告诉汇编器一次内存操作数的宽度：{name} 分别对应 1/2/4/8/10/16/16/32/64 字节或标记指针类型；在 // np3watch 注释中 byte/word/dword/qword 表示监控值的读取宽度，ptr 表示按目标位宽读取指针。",
+      "语法": "mov {name} ptr [addr],值 / cmp {name} ptr [addr],0",
+      "示例": "mov dword ptr [esi],1 / cmp byte ptr [esi],0",
+      "约束": "当两个操作数都无法推断宽度（立即数 + 内存）时必须写尺寸；寄存器操作数已隐含宽度时可省略。",
+      "相关": "db/dw/dd/dq、mov、cmp、movzx、align",
+      "易错": "漏写尺寸导致 CE 汇编器报「无法确定操作数大小」；64 位地址用 dword ptr 会截断指针；浮点 8 字节要用 qword ptr 或 movsd。",
+      "AA 语境": "写游戏数值时先确认字段类型：血量常为 dword/float(4 字节)，64 位指针为 qword，误用尺寸会覆盖相邻字段。"
+    },
+    {
+      "names": [
+        "movaps",
+        "movapd",
+        "movups",
+        "movupd",
+        "movntps",
+        "movntpd",
+        "movntdq",
+        "movnti",
+        "movbe",
+        "movabs"
+      ],
+      "功能": "x86 数据传送指令族的扩展成员：{name} 用于对齐/非对齐向量传送、非临时（绕过缓存）存储、字节序交换或立即数装载等特定场景。",
+      "语法": "{name} 目的, 源（具体形式随指令而定）",
+      "示例": "movups xmm0,[esi] / movaps [edi],xmm0",
+      "约束": "aps/apd/dqa 等对齐形式要求 16 字节对齐；ups/upd/dqu 不要求；非临时存储要求地址与缓存行对齐；movabs 仅 64 位。",
+      "相关": "mov、movdqu、movdqa、movsd、movss、vzeroupper",
+      "易错": "对齐形式用在任意游戏地址上会触发 #GP；不确定对齐时用 ups/upd/dqu；非临时存储不会立即可见于其他核，需配合 mfence。"
+    },
+    {
+      "names": [
+        "addsd",
+        "addps",
+        "addpd",
+        "subss",
+        "subsd",
+        "subps",
+        "subpd",
+        "mulss",
+        "mulsd",
+        "mulps",
+        "mulpd",
+        "divss",
+        "divsd",
+        "divps",
+        "divpd",
+        "sqrtss",
+        "sqrtsd",
+        "sqrtps",
+        "sqrtpd",
+        "maxss",
+        "maxsd",
+        "maxps",
+        "maxpd",
+        "minss",
+        "minsd",
+        "minps",
+        "minpd"
+      ],
+      "功能": "SSE 浮点算术指令：{name} 中 ss=标量单精度、sd=标量双精度、ps=packed 单精度(4×float)、pd=packed 双精度(2×double)。",
+      "语法": "{name} xmm, xmm/m（标量用 m32/m64，packed 用 m128）",
+      "示例": "addss xmm0,dword ptr [esi] / mulps xmm0,xmm1",
+      "约束": "标量形式只改低 32/64 位、高位保留；packed 形式要求 16 字节对齐（对齐版本）；不改变 EFLAGS，浮点异常走 MXCSR。",
+      "相关": "movss/movsd、comiss/ucomiss、cvtsi2ss、add、vaddps",
+      "易错": "把浮点指令当整数用；标量指令的高位残留会影响后续 packed 运算；packed 对齐要求与 NaN 传播顺序需留意。"
+    },
+    {
+      "names": [
+        "cvtss2sd",
+        "cvtsd2ss",
+        "cvtsi2sd",
+        "cvtdq2ps",
+        "cvtps2dq",
+        "cvtpd2dq",
+        "cvtdq2pd",
+        "cvtps2pd",
+        "cvtpd2ps",
+        "cvttsd2si",
+        "cvtss2si",
+        "cvtsd2si",
+        "rcpss",
+        "rcpps",
+        "rsqrtss",
+        "rsqrtps",
+        "comisd",
+        "ucomiss",
+        "ucomisd"
+      ],
+      "功能": "SSE 转换与比较指令：{name} 在整数/单精度/双精度间转换，或做浮点比较与倒数/平方根近似。",
+      "语法": "{name} 目的, 源",
+      "示例": "cvtsi2sd xmm0,eax / comisd xmm0,[esi]",
+      "约束": "带 t 的形式向零截断；溢出/NaN 转换返回不确定值；比较类指令写 ZF/PF/CF，NaN 时无序（PF=1）。",
+      "相关": "cvtsi2ss、cvttss2si、comiss、addsd、movsd",
+      "易错": "浮点比较后直接套用 jg/jl（应先 jp 处理 NaN）；有符号/无符号整数转换混用；近似指令精度只有约 12 位，不能直接用于精确计算。"
+    },
+    {
+      "names": [
+        "vaddps",
+        "vaddpd",
+        "vaddss",
+        "vaddsd",
+        "vsubps",
+        "vsubpd",
+        "vsubss",
+        "vsubsd",
+        "vmulps",
+        "vmulpd",
+        "vmulss",
+        "vmulsd",
+        "vdivps",
+        "vdivpd",
+        "vdivss",
+        "vdivsd",
+        "vsqrtps",
+        "vsqrtpd",
+        "vxorps",
+        "vxorpd",
+        "vandps",
+        "vandpd",
+        "vorps",
+        "vorpd",
+        "vpaddd",
+        "vpsubd",
+        "vpxor",
+        "vmovaps",
+        "vmovapd",
+        "vmovups",
+        "vmovupd",
+        "vmovdqa",
+        "vmovdqu",
+        "vmovss",
+        "vmovsd",
+        "vbroadcastss",
+        "vbroadcastsd",
+        "vinsertps",
+        "vpextrd",
+        "vzeroall"
+      ],
+      "功能": "AVX 三操作数向量指令：{name} 把两个源运算后写入独立目的寄存器，不破坏源（VEX 编码）。",
+      "语法": "{name} 目的, 源1, 源2/内存",
+      "示例": "vaddps ymm0,ymm1,ymm2",
+      "约束": "需要 AVX（部分需 AVX2）；ymm 对齐形式要求 32 字节对齐；与旧 SSE 代码混用前后需 vzeroupper。",
+      "相关": "vmovaps、vmovups、vzeroupper、xmm0-15、ymm0-15",
+      "易错": "目标 CPU 无 AVX 时 #UD；三操作数顺序与二操作数 SSE 指令相反（目的在最前），照搬会写错方向。"
+    },
+    {
+      "names": [
+        "fld",
+        "fst",
+        "fstp",
+        "fadd",
+        "faddp",
+        "fsub",
+        "fsubp",
+        "fsubr",
+        "fsubrp",
+        "fmul",
+        "fmulp",
+        "fdiv",
+        "fdivp",
+        "fdivr",
+        "fdivrp",
+        "fild",
+        "fistp",
+        "fchs",
+        "fabs",
+        "fsqrt",
+        "fcom",
+        "fcomp",
+        "fcompp",
+        "fucom",
+        "fucomp",
+        "fucompp",
+        "frndint",
+        "fprem",
+        "fprem1",
+        "fptan",
+        "fpatan",
+        "fsin",
+        "fcos",
+        "fsincos",
+        "f2xm1",
+        "fyl2x",
+        "fyl2xp1",
+        "fld1",
+        "fldl2t",
+        "fldl2e",
+        "fldpi",
+        "fldlg2",
+        "fldln2",
+        "fldz",
+        "fnop",
+        "fnclex",
+        "fclex",
+        "finit",
+        "fninit",
+        "fnstcw",
+        "fldcw",
+        "fnstsw",
+        "fnstenv",
+        "fldenv",
+        "fsave",
+        "frstor",
+        "fxch",
+        "ffree",
+        "fincstp",
+        "fdecstp",
+        "emms"
+      ],
+      "功能": "x87 浮点栈指令：{name} 操作 st(0)..st(7) 浮点寄存器栈（压栈/弹栈/运算/常量装载/控制字）。",
+      "语法": "{name} [st(i)] 或 {name} m32/m64/m80",
+      "示例": "fld dword ptr [esi] ; fadd st(0),st(1) ; fstp dword ptr [edi]",
+      "约束": "栈深度只有 8 层，溢出会得到 NaN；fstp 与 fst 的区别是是否弹栈；用 MMX 后必须 emms 才能恢复 x87；现代代码多用 SSE2。",
+      "相关": "emms、movss/movsd、addss、fnstsw、fcom",
+      "易错": "忘记弹栈导致浮点栈逐渐溢出；fstp/fst 混用破坏栈平衡；x87 与 SSE 混用时状态与异常标志互不相通。"
+    },
+    {
+      "names": [
+        "paddd",
+        "psubd",
+        "paddb",
+        "paddw",
+        "paddq",
+        "psubb",
+        "psubw",
+        "psubq",
+        "pmullw",
+        "pmulld",
+        "pmuludq",
+        "pmaxsd",
+        "pminsd",
+        "punpcklbw",
+        "punpcklwd",
+        "punpckldq",
+        "punpcklqdq",
+        "punpckhqdq",
+        "packsswb",
+        "packssdw",
+        "pshufd",
+        "psrldq",
+        "pslldq",
+        "pcmpeqb",
+        "pcmpeqd",
+        "unpcklps",
+        "shufps",
+        "pand",
+        "pandn",
+        "por"
+      ],
+      "功能": "SSE/MMX 整数向量指令：{name} 对 packed 整数做加减乘、比较、混排、打包或位运算。",
+      "语法": "{name} xmm/mm, xmm/m64/m128 [, imm8]",
+      "示例": "paddd xmm0,xmm1 / pcmpeqd xmm0,xmm1",
+      "约束": "需要 SSE2（128 位形式）；对齐形式要求 16 字节对齐；比较结果是全 0/全 1 掩码而非布尔值。",
+      "相关": "movdqu、pxor、pand、addps、emms",
+      "易错": "把掩码当作 0/1 使用；punpck/pshufd 的 lane 顺序容易搞反；饱和与非饱和指令（如 paddw 与 paddsw）行为不同。"
+    },
+    {
+      "names": [
+        "aesenc",
+        "aesenclast",
+        "aesdec",
+        "aesdeclast",
+        "sha1rnds4",
+        "crc32",
+        "pdep",
+        "pext",
+        "bextr",
+        "blsi",
+        "blsmsk",
+        "blsr",
+        "bzhi",
+        "mulx",
+        "shlx",
+        "shrx",
+        "sarx",
+        "rorx",
+        "andn",
+        "adcx",
+        "adox",
+        "rdrand",
+        "rdseed",
+        "xgetbv",
+        "xsetbv",
+        "clflush",
+        "clflushopt",
+        "prefetchnta",
+        "prefetcht0",
+        "prefetcht1",
+        "prefetcht2",
+        "prefetchw",
+        "wbinvd",
+        "invd"
+      ],
+      "功能": "专用扩展指令：{name} 属于 AES/SHA、BMI、ADX、随机数、缓存控制或系统指令集，需对应 CPU 特性。",
+      "语法": "{name} 目的, 源（具体形式随指令而定）",
+      "示例": "crc32 eax,byte ptr [esi] / rdrand eax ; jc ok",
+      "约束": "需用 cpuid 检测特性位（AES-NI、BMI1/2、ADX、RDRAND 等）；部分为特权指令（wbinvd/invd 仅 ring 0）；rdrand 通过 CF 表示成功。",
+      "相关": "cpuid、xgetbv、popcnt、lzcnt、tzcnt、mfence",
+      "易错": "在未检测特性的 CPU 上执行会 #UD；wbinvd/invd 在用户态会 #GP；rdrand 不检查 CF 会拿到无效随机值。"
+    },
+    {
+      "names": [
+        "pushad",
+        "popad",
+        "pushfd",
+        "popfd",
+        "pushfq",
+        "popfq",
+        "pusha",
+        "popa",
+        "retn",
+        "retf",
+        "iret",
+        "iretd",
+        "iretq",
+        "sysret",
+        "sysenter",
+        "sysexit",
+        "int",
+        "into",
+        "ud2",
+        "wait",
+        "fwait",
+        "xlat",
+        "xlatb",
+        "xbegin",
+        "xend",
+        "xabort",
+        "xtest",
+        "xacquire",
+        "xrelease",
+        "lfence",
+        "sfence",
+        "cmc",
+        "cli",
+        "sti",
+        "in",
+        "out",
+        "insb",
+        "insw",
+        "insd",
+        "outsb",
+        "outsw",
+        "outsd"
+      ],
+      "功能": "系统/栈/特权类 x86 指令：{name} 用于批量保存寄存器、标志位、中断返回、系统调用、端口 IO、事务内存或内存屏障。",
+      "语法": "{name} [操作数]",
+      "示例": "pushad ... popad（32 位注入代码保存现场）",
+      "约束": "pushad/popad/pushfd/popfq 等在 64 位模式不可用或语义不同；cli/sti/in/out/wbinvd 等为用户态特权指令，执行会 #GP；xbegin/xend 属 TSX，很多 CPU 已禁用。",
+      "相关": "push/pop、call/ret、syscall、mfence、lock、cld/std",
+      "易错": "64 位 CE 脚本里照搬 32 位模板的 pushad/popad 会汇编失败（应逐个 push 需要的寄存器）；用户态使用特权指令必然崩溃。",
+      "AA 语境": "注入代码保存现场时，32 位可用 pushad/popad，64 位必须手动 push 实际改动的寄存器并严格逆序 pop。"
+    },
+    {
+      "names": [
+        "resb",
+        "resw",
+        "resd",
+        "resq",
+        "times",
+        "equ",
+        "short",
+        "near",
+        "far",
+        "float",
+        "double",
+        "real4",
+        "real8",
+        "real10"
+      ],
+      "功能": "汇编伪指令/类型说明符：{name} 用于保留未初始化空间、重复指令、定义常量、指定跳转距离或数据宽度；在 // np3watch 注释中 float/double 表示按 4/8 字节浮点读取监控值。",
+      "语法": "{name} 参数（依具体伪指令而定）",
+      "示例": "resb 16 / times 4 db 90 / equ 0x100 / (float)1.0",
+      "约束": "res* 只推进位置不写入字节；CE 自动汇编对部分 NASM 风格伪指令支持有限；real4/real8/real10 对应 4/8/10 字节浮点。",
+      "相关": "db/dw/dd/dq、align、define、dd (float)1.0",
+      "易错": "把 resb 当成写 0 的指令（它不初始化内存）；CE 的 AA 语法与 NASM/MASM 不完全一致，不支持的伪指令要改用 db/dd。"
+    },
+    {
+      "names": [
+        "movsw",
+        "movsq",
+        "stosw",
+        "stosd",
+        "stosq",
+        "lodsw",
+        "lodsd",
+        "lodsq",
+        "scasw",
+        "scasd",
+        "scasq",
+        "cmpsw",
+        "cmpsd",
+        "cmpsq",
+        "repe",
+        "repz",
+        "repne",
+        "repnz",
+        "loopne",
+        "loope",
+        "loopnz",
+        "loopz"
+      ],
+      "功能": "x86 串操作与重复前缀：{name} 对连续内存做按 2/4/8 字节的传送、存储、装入、扫描或比较，或按计数/条件重复执行串指令。",
+      "语法": "{name}（部分带标签或后接串指令）",
+      "示例": "cld ; mov ecx,0x40 ; rep movsq",
+      "约束": "隐含 ESI/EDI/ECX 与 AL/AX/EAX/RAX；受 DF 方向标志影响；repe/repne 的停止条件由 ZF 决定；不改变标志位（串指令本身）。",
+      "相关": "rep、movsb、stosb、lodsb、scasb、cmpsb、cld/std",
+      "易错": "忘记 cld；repe/repne 停止条件记反；movsd/cmpsd 与 SSE 同名指令混淆；std 后不恢复 DF 会影响整个进程后续串操作。"
+    },
+    {
+      "names": [
+        "shld",
+        "shrd",
+        "rol",
+        "ror",
+        "rcl",
+        "rcr",
+        "sal"
+      ],
+      "功能": "移位/循环/位操作类指令：{name} 对寄存器或内存做左移、右移、循环移位、带进位循环或跨寄存器双精度移位。",
+      "语法": "{name} 目的, 计数[, 源]",
+      "示例": "rol eax,8 / shld eax,ebx,cl",
+      "约束": "计数可用立即数或 CL；计数会被屏蔽（32 位取低 5 位，64 位取低 6 位）；计数为 0 时不改变标志位；CF 保存最后移出的位。",
+      "相关": "shl/shr/sar、bt/bts/btr、bswap、and/or/xor",
+      "易错": "rol/ror 是循环（位不丢失）而 shl/shr 会丢位；rcl/rcr 依赖进入时的 CF；有符号右移用 sar 而非 shr。"
+    },
+    {
+      "names": [
+        "cmpxchg8b",
+        "cmpxchg16b",
+        "lzcnt",
+        "tzcnt"
+      ],
+      "功能": "x86 原子/位扫描/乘除等常用指令：{name} 属于整数运算或多核同步相关指令，具体语义见其专有说明或同类说明。",
+      "语法": "{name} 目的[, 源]",
+      "示例": "lock cmpxchg [esi],ecx",
+      "约束": "多核同步需 lock 前缀；cmpxchg16b 要求 16 字节对齐且用 RDX:RAX/RCX:RBX；lzcnt/tzcnt 需对应 CPU 特性。",
+      "相关": "lock、cmpxchg、xadd、bsf/bsr、popcnt、mfence",
+      "易错": "原子性不是默认的（除 xchg 对内存隐含锁定）；cmpxchg16b 内存未对齐会 #GP；未检测特性就使用 BMI 指令会 #UD。"
+    },
+    {
+      "names": [
+        "readBytesLocal",
+        "readDoubleLocal",
+        "readFloatLocal",
+        "readIntegerLocal",
+        "readPointerLocal",
+        "readQwordLocal",
+        "readSmallIntegerLocal",
+        "readStringLocal",
+        "writeBytesLocal",
+        "writeDoubleLocal",
+        "writeFloatLocal",
+        "writeIntegerLocal",
+        "writePointerLocal",
+        "writeQwordLocal",
+        "writeSmallIntegerLocal",
+        "writeStringLocal"
+      ],
+      "功能": "读写 Cheat Engine 自身进程内存（不是目标进程）。{name} 的 Local 后缀即表示操作 CE 自己。",
+      "语法": "value = {name}(address[, length]) / {name}(address, value)",
+      "示例": "local buf = readBytesLocal(0x400000, 16) / writeIntegerLocal(addr, 1)",
+      "约束": "地址必须落在 CE 进程内且可读/可写；读取游戏内存要用不带 Local 的版本。",
+      "相关": "readInteger/writeInteger、readBytes/writeBytes、allocateMemory",
+      "易错": "把目标进程地址传给 Local 版本，读到的是 CE 自己的内存，结果看似随机。"
+    },
+    {
+      "names": [
+        "readByte",
+        "writeByte",
+        "readWord",
+        "writeWord",
+        "readSmallInteger",
+        "writeSmallInteger",
+        "readQword",
+        "writeQword",
+        "writePointer",
+        "readPointer"
+      ],
+      "功能": "按固定宽度读写目标进程内存。{name} 决定一次读写多少字节：Byte=1、Word=2、SmallInteger/Dword=4、Qword/Pointer=8。",
+      "语法": "value = {name}(address) / {name}(address, value)",
+      "示例": "local hp = readSmallInteger(\"playerBase\"+0x10) / writeByte(addr, 0x90)",
+      "约束": "地址必须可读/可写；写入宽度必须与游戏字段一致；返回 nil 表示读取失败。",
+      "相关": "readInteger/writeInteger、readBytes/writeBytes、readPointer",
+      "易错": "用 readByte 读 4 字节字段只会拿到最低字节；写入宽度过大会覆盖相邻字段。"
+    },
+    {
+      "names": [
+        "setDescription",
+        "getDescription",
+        "setAddress",
+        "getAddress",
+        "setType",
+        "getType",
+        "setValue",
+        "getValue",
+        "setScript",
+        "getScript",
+        "setColor",
+        "getColor",
+        "getOffset",
+        "setOffset",
+        "mr.getAddress",
+        "mr.setAddress",
+        "mr.getDescription",
+        "mr.setDescription",
+        "mr.getType",
+        "mr.setType",
+        "mr.getValue",
+        "mr.setValue",
+        "mr.getScript",
+        "mr.setScript",
+        "mr.getColor",
+        "mr.setColor",
+        "mr.getOffset",
+        "mr.setOffset"
+      ],
+      "功能": "内存记录（MemoryRecord）访问器：{name} 读取或设置地址、类型、数值、描述、脚本、颜色与偏移。",
+      "语法": "record = al.getMemoryRecord(i); record.{name}(...)",
+      "示例": "local mr = getAddressList().getMemoryRecord(0); print(mr.getDescription())",
+      "约束": "需要先取得记录对象；类型必须与数值匹配；修改后地址列表界面不会自动刷新。",
+      "相关": "getAddressList、createMemoryRecord、getMemoryRecordByID",
+      "易错": "把 setValue 的类型写错（如给 vtDword 记录写浮点）；记录未激活时读到的值可能不是实时值。"
+    },
+    {
+      "names": [
+        "Align",
+        "AutoSize",
+        "Caption",
+        "Checked",
+        "Color",
+        "Enabled",
+        "Font",
+        "Height",
+        "Hint",
+        "Items",
+        "Left",
+        "Lines",
+        "Max",
+        "Min",
+        "Name",
+        "OnChange",
+        "OnClick",
+        "OnKeyDown",
+        "Parent",
+        "Position",
+        "ReadOnly",
+        "Text",
+        "Top",
+        "Visible",
+        "Width",
+        "control.Align",
+        "control.AutoSize",
+        "control.Caption",
+        "control.Checked",
+        "control.Color",
+        "control.Enabled",
+        "control.Font",
+        "control.Height",
+        "control.Hint",
+        "control.Items",
+        "control.Left",
+        "control.Lines",
+        "control.Max",
+        "control.Min",
+        "control.Name",
+        "control.OnChange",
+        "control.OnClick",
+        "control.OnKeyDown",
+        "control.Parent",
+        "control.Position",
+        "control.ReadOnly",
+        "control.Text",
+        "control.Top",
+        "control.Visible",
+        "control.Width",
+        "form.Show",
+        "form.Hide",
+        "form.Free",
+        "Show",
+        "Hide",
+        "Free"
+      ],
+      "功能": "CE 窗体与控件属性/方法：{name} 设置外观（Caption/Text/Color/Font/Width/Height）、状态（Visible/Enabled/ReadOnly/Checked）或事件（OnClick/OnChange/OnKeyDown）。",
+      "语法": "control.{name} = value / control.{name}(...)",
+      "示例": "local b = createButton(form); b.Caption = \"执行\"; b.OnClick = function() showMessage(\"ok\") end",
+      "约束": "控件必须先创建并设置 Parent；属性类型固定（字符串/布尔/数值/函数）；Show/Hide/Free 是方法。",
+      "相关": "createButton、createForm、createTimer",
+      "易错": "把 OnClick 写成字符串；对已 Free 的控件继续访问会报错；非主线程回调里操作控件不稳定。"
+    },
+    {
+      "names": [
+        "createButton",
+        "createCheckBox",
+        "createComboBox",
+        "createDisassemblerView",
+        "createEdit",
+        "createFont",
+        "createGroupBox",
+        "createHexadecimalView",
+        "createImage",
+        "createLabel",
+        "createListBox",
+        "createListView",
+        "createMemo",
+        "createMemoryView",
+        "createPageControl",
+        "createPanel",
+        "createProgressBar",
+        "createSplitter",
+        "createStackView",
+        "createTabControl",
+        "createTable",
+        "createTrackBar",
+        "createTreeView",
+        "createUpDown"
+      ],
+      "功能": "在 CE 窗体上创建控件：{name} 返回控件对象，随后用 Caption/Left/Top/Width/Height/OnClick 等属性配置。",
+      "语法": "control = {name}(owner)",
+      "示例": "local lbl = createLabel(form); lbl.Caption = \"状态\"",
+      "约束": "owner 必须是窗体或容器控件；创建后需设置位置尺寸；同一控件不要重复创建。",
+      "相关": "createForm、控件的 Caption/OnClick 属性",
+      "易错": "忘记设置 Parent 导致控件不可见；窗体销毁后仍持有控件引用。"
+    },
+    {
+      "names": [
+        "VK_LBUTTON",
+        "VK_RBUTTON",
+        "VK_MBUTTON",
+        "VK_BACK",
+        "VK_TAB",
+        "VK_RETURN",
+        "VK_SHIFT",
+        "VK_CONTROL",
+        "VK_MENU",
+        "VK_PAUSE",
+        "VK_CAPITAL",
+        "VK_ESCAPE",
+        "VK_SPACE",
+        "VK_PRIOR",
+        "VK_NEXT",
+        "VK_END",
+        "VK_HOME",
+        "VK_LEFT",
+        "VK_UP",
+        "VK_RIGHT",
+        "VK_DOWN",
+        "VK_INSERT",
+        "VK_DELETE",
+        "VK_LSHIFT",
+        "VK_RSHIFT",
+        "VK_LCONTROL",
+        "VK_RCONTROL",
+        "VK_LMENU",
+        "VK_RMENU",
+        "VK_F1",
+        "VK_F2",
+        "VK_F3",
+        "VK_F4",
+        "VK_F5",
+        "VK_F6",
+        "VK_F7",
+        "VK_F8",
+        "VK_F9",
+        "VK_F10",
+        "VK_F11",
+        "VK_F12",
+        "VK_NUMLOCK",
+        "VK_MULTIPLY",
+        "VK_ADD",
+        "VK_SUBTRACT",
+        "VK_NUMPAD0",
+        "VK_NUMPAD1",
+        "VK_NUMPAD2",
+        "VK_NUMPAD3"
+      ],
+      "功能": "Windows 虚拟键码常量，供快捷键/按键模拟 API 使用；{name} 对应一个具体按键。",
+      "语法": "isKeyPressed({name}) / createHotkey(function() end, {name})",
+      "示例": "if isKeyPressed(VK_F5) then showMessage(\"F5\") end",
+      "约束": "是虚拟码而非字符码；左右修饰键（VK_LSHIFT/VK_RSHIFT）与通用键（VK_SHIFT）不同；部分键需窗口焦点。",
+      "相关": "isKeyPressed、createHotkey、keyDown/keyUp",
+      "易错": "用字符 'A' 代替 VK 码；VK_SHIFT 与 VK_LSHIFT 混用导致左右键判断失效。"
+    },
+    {
+      "names": [
+        "tonumber",
+        "tostring",
+        "type",
+        "pairs",
+        "ipairs",
+        "next",
+        "select",
+        "pcall",
+        "xpcall",
+        "error",
+        "assert",
+        "collectgarbage",
+        "getmetatable",
+        "setmetatable",
+        "rawequal",
+        "rawget",
+        "rawset",
+        "require",
+        "dofile",
+        "loadfile",
+        "load"
+      ],
+      "功能": "Lua 语言基础函数：{name} 用于类型转换、迭代、错误处理、元表与模块加载。",
+      "语法": "{name}(...)",
+      "示例": "for k, v in pairs(t) do print(k, tostring(v)) end",
+      "约束": "遵循 Lua 5.x 语义；pcall/xpcall 返回 (ok, err)；rawget/rawset 绕过元表；load 在 CE 中受限。",
+      "相关": "type、tostring、pcall",
+      "易错": "用 ipairs 遍历含 nil 的数组会提前结束；忘记检查 pcall 的返回值；对 userdata 调用 tonumber 得到 nil。"
+    },
+    {
+      "names": [
+        "math.abs",
+        "math.ceil",
+        "math.cos",
+        "math.deg",
+        "math.exp",
+        "math.floor",
+        "math.fmod",
+        "math.huge",
+        "math.log",
+        "math.max",
+        "math.min",
+        "math.modf",
+        "math.pi",
+        "math.rad",
+        "math.random",
+        "math.randomseed",
+        "math.sin",
+        "math.sqrt",
+        "math.tan",
+        "math.tointeger",
+        "math.type"
+      ],
+      "功能": "Lua 标准 math 库：{name} 提供取整、三角函数、对数、随机数与常量。",
+      "语法": "{name}(x[, ...])",
+      "示例": "local v = math.floor(readFloat(addr) + 0.5)",
+      "约束": "角度单位是弧度；math.random() 无参返回 [0,1)，带参返回整数；math.huge/math.pi 是常量。",
+      "相关": "math.floor、math.random、math.tointeger",
+      "易错": "把度数直接传给 math.sin；math.floor 对负数的语义与截断不同；未 randomseed 时序列可复现。"
+    },
+    {
+      "names": [
+        "string.byte",
+        "string.char",
+        "string.find",
+        "string.format",
+        "string.gmatch",
+        "string.gsub",
+        "string.len",
+        "string.lower",
+        "string.match",
+        "string.rep",
+        "string.reverse",
+        "string.sub",
+        "string.upper"
+      ],
+      "功能": "Lua 标准 string 库：{name} 做查找、替换、格式化、大小写与子串处理。",
+      "语法": "{name}(s, ...)",
+      "示例": "local n = string.format(\"%08X\", addr)",
+      "约束": "Lua 模式串不是正则（%d/%a/%s 等）；下标从 1 开始；%s 不会自动转数字。",
+      "相关": "string.find、string.format、string.gsub",
+      "易错": "把正则写法（.*?）用在 Lua 模式里；sub 结束下标越界会报错；对 UTF-8 中文按字节处理。"
+    },
+    {
+      "names": [
+        "os.clock",
+        "os.date",
+        "os.difftime",
+        "os.execute",
+        "os.exit",
+        "os.getenv",
+        "os.remove",
+        "os.rename",
+        "os.time",
+        "os.tmpname"
+      ],
+      "功能": "Lua 标准 os 库：{name} 提供时间、环境变量与文件系统操作。",
+      "语法": "{name}(...)",
+      "示例": "local t = os.date(\"%H:%M:%S\")",
+      "约束": "os.execute 会启动外部进程，CE 沙箱可能限制；os.time 精度为秒；os.exit 会终止 CE。",
+      "相关": "os.time、os.date、createTimer",
+      "易错": "用 os.clock 做长时间计时（它是 CPU 时间）；os.exit 会直接关闭 CE。"
+    },
+    {
+      "names": [
+        "break",
+        "do",
+        "else",
+        "elseif",
+        "end",
+        "false",
+        "for",
+        "function",
+        "goto",
+        "if",
+        "local",
+        "nil",
+        "repeat",
+        "return",
+        "then",
+        "true",
+        "until",
+        "while"
+      ],
+      "功能": "Lua 语言关键字：{name} 构成控制流、函数定义与变量声明。",
+      "语法": "按 Lua 语法使用，例如 if cond then ... end",
+      "示例": "for i = 1, 10 do if i % 2 == 0 then print(i) end end",
+      "约束": "关键字不能作标识符；then/do/end 必须配对；goto 标签作用域受限。",
+      "相关": "Lua 基础函数、{$lua} 块",
+      "易错": "漏写 end；用 = 代替 ==；在 {$lua} 块外写 Lua 关键字。"
+    },
+    {
+      "names": [
+        "byteTableToDouble",
+        "byteTableToDword",
+        "byteTableToExtended",
+        "byteTableToFloat",
+        "byteTableToQword",
+        "byteTableToString",
+        "byteTableToWideString",
+        "byteTableToWord",
+        "doubleToByteTable",
+        "dwordToByteTable",
+        "extendedToByteTable",
+        "floatToByteTable",
+        "qwordToByteTable",
+        "signExtend",
+        "stringToByteTable",
+        "wideStringToByteTable",
+        "wordToByteTable"
+      ],
+      "功能": "数值与字节表互转：{name} 在 Lua 数值/字符串与 CE 的 byte table 之间转换。",
+      "语法": "table = {name}(value) / value = {name}(table)",
+      "示例": "local bytes = dwordToByteTable(0x12345678)",
+      "约束": "字节序为小端；byte table 索引从 1 开始；WideString 为 UTF-16。",
+      "相关": "readBytes/writeBytes、stringToByteTable",
+      "易错": "把返回的表当成从 0 开始索引；字符串与宽字符串混用导致乱码；signExtend 需要指定位宽。"
+    },
+    {
+      "names": [
+        "vtBinary",
+        "vtByte",
+        "vtByteArray",
+        "vtCustom",
+        "vtDouble",
+        "vtDword",
+        "vtPointer",
+        "vtQword",
+        "vtSingle",
+        "vtString",
+        "vtWord"
+      ],
+      "功能": "内存记录的值类型常量：{name} 指定该记录按几种字节/格式解释内存。",
+      "语法": "record.Type = {name}",
+      "示例": "mr.Type = vtDword",
+      "约束": "类型决定读写宽度与显示格式；Pointer 依赖目标进程位数；ByteArray/Binary 需要长度。",
+      "相关": "setType/getType、readInteger、readFloat",
+      "易错": "用 vtDword 读 64 位指针会截断；vtSingle 与 vtDouble 弄反导致浮点值离谱。"
+    },
+    {
+      "names": [
+        "al.createMemoryRecord",
+        "al.deleteMemoryRecord",
+        "al.getCount",
+        "al.getMemoryRecord",
+        "al.getMemoryRecordByDescription",
+        "al.getMemoryRecordByID",
+        "createMemoryRecord",
+        "deleteMemoryRecord",
+        "getCount",
+        "getMemoryRecord"
+      ],
+      "功能": "地址列表操作：{name} 创建/删除/获取内存记录并查询数量。",
+      "语法": "al.{name}(...) / getAddressList().{name}(...)",
+      "示例": "local al = getAddressList(); local mr = al.createMemoryRecord()",
+      "约束": "索引从 0 开始；删除后原对象失效；按 ID/描述查找找不到时返回 nil。",
+      "相关": "getAddressList、内存记录属性、getMemoryRecordByID",
+      "易错": "用 1 作为第一个索引；删除后继续使用旧对象；未判断 nil 直接访问属性。"
+    },
+    {
+      "names": [
+        "compareMemory",
+        "copyMemory",
+        "enumMemoryRegions",
+        "readRegion",
+        "readRegionFromFile",
+        "virtualProtectEx",
+        "virtualQueryEx",
+        "writeRegion",
+        "writeRegionToFile"
+      ],
+      "功能": "内存区域级操作：{name} 复制/比较/枚举/读写整段内存或查询页属性。",
+      "语法": "{name}(address, size, ...)",
+      "示例": "copyMemory(dst, src, 0x100)",
+      "约束": "区间必须位于已提交内存；跨页操作可能因某页不可读而失败；size 单位是字节。",
+      "相关": "readBytes/writeBytes、virtualProtectEx、enumMemoryRegions",
+      "易错": "把 size 当成元素个数；对只读页直接 writeRegion 而不先 virtualProtectEx。"
+    },
+    {
+      "names": [
+        "deleteFile",
+        "extractFileExt",
+        "extractFileName",
+        "extractFileNameWithoutExt",
+        "extractFilePath",
+        "fileExists",
+        "getDirectoryList",
+        "getFileList",
+        "getFileVersion",
+        "getTempFolder",
+        "loadTable",
+        "md5file",
+        "saveTable"
+      ],
+      "功能": "CE 文件工具：{name} 解析路径、判断存在、列目录、读写 Lua 表或计算文件摘要。",
+      "语法": "{name}(path, ...)",
+      "示例": "if fileExists(\"C:\\\\mods\\\\a.lua\") then print(extractFileName(\"C:\\\\mods\\\\a.lua\")) end",
+      "约束": "相对路径依赖 CE 工作目录，建议用绝对路径；loadTable/saveTable 使用 CE 自有格式。",
+      "相关": "getTempFolder、fileExists、saveTable",
+      "易错": "路径反斜杠未转义；对不存在的文件调用 getFileVersion 返回空；getDirectoryList 结果含 . 与 ..。"
+    },
+    {
+      "names": [
+        "createHotkey",
+        "doKeyPress",
+        "doubleClick",
+        "getForegroundWindow",
+        "getKeyState",
+        "getMousePos",
+        "getWindowlist",
+        "isKeyPressed",
+        "keyDown",
+        "keyUp",
+        "mouse_event",
+        "setMousePos"
+      ],
+      "功能": "键鼠与窗口模拟：{name} 检测/模拟按键、移动鼠标、获取前台窗口与窗口列表。",
+      "语法": "{name}(...)",
+      "示例": "keyDown(VK_SHIFT); doKeyPress(VK_A); keyUp(VK_SHIFT)",
+      "约束": "部分 API 需要目标窗口获得焦点；keyDown 必须与 keyUp 配对；反作弊环境可能被检测。",
+      "相关": "VK_ 虚拟键码、createHotkey、isKeyPressed",
+      "易错": "只 keyDown 不 keyUp 导致按键卡住；无焦点窗口上 doKeyPress 无效；getMousePos 返回屏幕坐标。"
+    },
+    {
+      "names": [
+        "cheatEngineIs64Bit",
+        "cheatEngineIsBeta",
+        "enableKernelSymbols",
+        "enableWindowsSymbols",
+        "enumModules",
+        "getAddressSafe",
+        "getCheatEngineDir",
+        "getModuleByAddress",
+        "getModuleSize",
+        "getOpenProcessID",
+        "getProcessIDFromProcessName",
+        "getProcessNameFromID",
+        "getRTTIClassName",
+        "getSymbolInfo",
+        "inModule",
+        "reinitializeSymbolhandler",
+        "waitForDotNet",
+        "waitForExports",
+        "waitForPDB",
+        "waitForSections"
+      ],
+      "功能": "进程/模块/符号环境：{name} 查询模块范围与大小、解析符号、等待调试信息或获取 CE 自身信息。",
+      "语法": "{name}(...)",
+      "示例": "local m = getModuleByAddress(addr); print(getModuleSize(m))",
+      "约束": "需先附加进程；PDB/导出等待可能阻塞；getAddressSafe 未找到返回 nil 而非 0。",
+      "相关": "openProcess、getOpenedProcessID、inModule",
+      "易错": "把 getAddressSafe 的 nil 当成地址使用；对未加载模块调用 getModuleSize；waitFor* 可能长时间阻塞。"
+    },
+    {
+      "names": [
+        "andps",
+        "andpd",
+        "andnps",
+        "andnpd",
+        "orps",
+        "orpd",
+        "xorpd",
+        "xorps"
+      ],
+      "功能": "SSE packed 位逻辑指令：{name} 对 128 位向量按位做与/与非/或/异或。",
+      "语法": "{name} xmm, xmm/m128",
+      "示例": "andps xmm0,xmm1（清除符号位）",
+      "约束": "需要 SSE；内存操作数要求 16 字节对齐；不改变 EFLAGS。",
+      "相关": "xorps、pxor、pand/pandn/por、movaps",
+      "易错": "与整数 pand 混用（域切换开销）；地址未对齐触发 #GP。"
+    },
+    {
+      "names": [
+        "cr0",
+        "cr2",
+        "cr3",
+        "cr4",
+        "cr8",
+        "dr0",
+        "dr1",
+        "dr2",
+        "dr3",
+        "dr4",
+        "dr5",
+        "dr6",
+        "dr7",
+        "mm0",
+        "mm1",
+        "mm2",
+        "mm3",
+        "mm4",
+        "mm5",
+        "mm6",
+        "mm7",
+        "st0",
+        "st1",
+        "st2",
+        "st3",
+        "st4",
+        "st5",
+        "st6",
+        "st7",
+        "eip",
+        "eflags",
+        "rip",
+        "rflags",
+        "cs",
+        "ds",
+        "es",
+        "fs",
+        "gs",
+        "ss"
+      ],
+      "功能": "控制/调试/MMX/浮点栈/指令指针/段寄存器：{name} 是特殊用途寄存器，多数只在 ring 0 或特定上下文可访问。",
+      "语法": "mov eax,{name} / mov {name},eax（仅限允许的指令）",
+      "示例": "mov eax,cr0（需 ring 0）",
+      "约束": "CR/DR 用户态不可访问（#GP）；MMX 与 x87 共享寄存器，用后需 emms；eip/rip 不能直接 mov。",
+      "相关": "emms、cdq/cqo、段寄存器、syscall",
+      "易错": "在用户态脚本里读写 CR/DR 必定崩溃；把 eip 当作通用寄存器；MMX 后未 emms 影响 x87。"
+    },
+    {
+      "names": [
+        "cbw",
+        "cwd",
+        "jcxz",
+        "rdtscp",
+        "endbr32",
+        "originalcode"
+      ],
+      "功能": "杂项 x86 指令/AA 约定：{name} 分别做累加器扩展、条件跳转、带序列化的时间戳读取、CET 落点标记，或表示被替换的原指令块。",
+      "语法": "{name} [操作数]",
+      "示例": "originalcode: / readmem(hookAddr,6) / jmp returnhere",
+      "约束": "cbw 是 AL→AX、cwd 是 AX→DX:AX；jcxz 判断 CX 为 0；rdtscp 需 RDTSCP 特性；originalcode 是 AA 标签约定。",
+      "相关": "cdq/cqo、cwde、jecxz、readmem",
+      "易错": "把 cbw/cwd/cwde/cdq 搞混；在 64 位脚本里用 jcxz；把 originalcode 当成真实指令。"
+    },
+    {
+      "names": [
+        "zmm16",
+        "zmm17",
+        "zmm18",
+        "zmm19",
+        "zmm20",
+        "zmm21",
+        "zmm22",
+        "zmm23",
+        "zmm24",
+        "zmm25",
+        "zmm26",
+        "zmm27",
+        "zmm28",
+        "zmm29",
+        "zmm30",
+        "zmm31"
+      ],
+      "功能": "AVX-512 扩展向量寄存器 zmm16-zmm31；{name} 仅在 64 位模式且 CPU 支持 AVX-512 时可用。",
+      "语法": "vmovaps {name},[addr] / vaddps {name},{name},{name}",
+      "示例": "vxorps {name},{name},{name}",
+      "约束": "需要 AVX-512F 与 OS 支持；zmm 对齐指令要求 64 字节对齐；写 zmm 会覆盖对应 ymm/xmm 低位视图。",
+      "相关": "zmm0-15、ymm0-15、vzeroupper、cpuid",
+      "易错": "在不支持 AVX-512 的 CPU 上执行会 #UD；按 xmm 编号思考导致寄存器混用。"
+    },
+    {
+      "names": ["u8", "i8"],
+      "功能": "{name} 是 np3watch 的 8 位整数读取类型别名（同 byte）；u 前缀按无符号、i 前缀按有符号解释。",
+      "语法": "// np3watch <名称> {name} [进制]",
+      "示例": "// np3watch flag u8 hex / // np3watch delta i8 dec",
+      "约束": "读取 1 字节；有符号负值只在 i8 下按补码显示为负数。",
+      "相关": "byte、u16、i16、np3watch",
+      "易错": "用 u8 读有符号字节会显示 128~255 的正数。"
+    },
+    {
+      "names": ["u16", "i16"],
+      "功能": "{name} 是 np3watch 的 16 位整数读取类型别名（同 word）；u 前缀按无符号、i 前缀按有符号解释。",
+      "语法": "// np3watch <名称> {name} [进制]",
+      "示例": "// np3watch level u16 dec / // np3watch offset i16 hex",
+      "约束": "读取 2 字节（小端）；有符号负值只在 i16 下按补码显示。",
+      "相关": "word、u8、i8、u32、i32、np3watch",
+      "易错": "用 i16 读取无符号字段时大于 32767 的值会变成负数。"
+    },
+    {
+      "names": ["u32", "i32"],
+      "功能": "{name} 是 np3watch 的 32 位整数读取类型别名（同 dword）；u 前缀按无符号、i 前缀按有符号解释。",
+      "语法": "// np3watch <名称> {name} [进制]",
+      "示例": "// np3watch hp u32 dec / // np3watch delta i32 dec",
+      "约束": "读取 4 字节（小端）；有符号负值只在 i32 下按补码显示。",
+      "相关": "dword、u16、i16、u64、i64、np3watch",
+      "易错": "地址/指针用 u32 会在 x64 目标上截断高 32 位，应改用 pointer/u64。"
+    },
+    {
+      "names": ["u64", "i64"],
+      "功能": "{name} 是 np3watch 的 64 位整数读取类型别名（同 qword）；u 前缀按无符号、i 前缀按有符号解释。",
+      "语法": "// np3watch <名称> {name} [进制]",
+      "示例": "// np3watch money u64 dec / // np3watch delta i64 dec",
+      "约束": "读取 8 字节（小端）；Lua 数值为双精度，超过 2^53 的整数会损失精度。",
+      "相关": "qword、u32、i32、pointer、np3watch",
+      "易错": "在 32 位目标上读 8 字节会越过字段边界；大整数显示可能被四舍五入。"
+    },
+    {
+      "names": ["f32", "f64"],
+      "功能": "{name} 是 np3watch 的浮点类型别名：f32 等同 float（4 字节），f64 等同 double（8 字节）。",
+      "语法": "// np3watch <名称> {name} [进制]",
+      "示例": "// np3watch pos_x f32 dec / // np3watch velocity f64 dec",
+      "约束": "浮点建议用 dec 显示；hex/bin 可观察原始位模式。",
+      "相关": "float、double、np3watch",
+      "易错": "把整数地址当 f32 读会得到极小/极大值或 NaN；f32 与 f64 宽度不同，读错会连带相邻字段。"
+    }
+  ]
+}

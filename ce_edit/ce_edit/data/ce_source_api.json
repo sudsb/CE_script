@@ -1,0 +1,1507 @@
+[
+ {
+  "name": "ansiToUtf8",
+  "signature": "ansiToUtf8(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "broadcastEnvironmentUpdate",
+  "signature": "broadcastEnvironmentUpdate(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "CEForm",
+  "signature": "CEForm -- CE 窗体",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "CEServerInterface",
+  "signature": "CEServerInterface -- CEServer 接口",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "CheatComponent",
+  "signature": "CheatComponent -- CE 组件基类",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "compileCSharp",
+  "signature": "compileCSharp(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "compilecsharp",
+  "signature": "compilecsharp(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "coroutine.isyieldable",
+  "signature": "coroutine.isyieldable()",
+  "category": "coroutine 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "createAPC",
+  "signature": "createAPC(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "createMachThread",
+  "signature": "createMachThread(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "createNativeThread",
+  "signature": "createNativeThread(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "createNativeThreadNewState",
+  "signature": "createNativeThreadNewState(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "createNativeThreadSuspended",
+  "signature": "createNativeThreadSuspended(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "createTableEntry",
+  "signature": "createTableEntry(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "CriticalSection",
+  "signature": "CriticalSection -- 临界区 (createCriticalSection)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "D3DHOOK",
+  "signature": "D3DHOOK -- D3D Hook 对象",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "dbk_test",
+  "signature": "dbk_test(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_debug_setSpinlockTimeout",
+  "signature": "dbvm_debug_setSpinlockTimeout(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_disableTSCHook",
+  "signature": "dbvm_disableTSCHook(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_enableTSCHook",
+  "signature": "dbvm_enableTSCHook(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_ept_reset",
+  "signature": "dbvm_ept_reset(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_findCR3",
+  "signature": "dbvm_findCR3(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_get_statistics",
+  "signature": "dbvm_get_statistics(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_getCR0",
+  "signature": "dbvm_getCR0(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_getCR3",
+  "signature": "dbvm_getCR3(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_getNMIcount",
+  "signature": "dbvm_getNMIcount(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_hidephysicalmemory",
+  "signature": "dbvm_hidephysicalmemory(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_hidephysicalmemoryall",
+  "signature": "dbvm_hidephysicalmemoryall(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_jtagbp",
+  "signature": "dbvm_jtagbp(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_psod",
+  "signature": "dbvm_psod(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_raisePMI",
+  "signature": "dbvm_raisePMI(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_registerPlugin",
+  "signature": "dbvm_registerPlugin(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_ultimap2_hideRangeUsage",
+  "signature": "dbvm_ultimap2_hideRangeUsage(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_ultimap_getDebugInfo",
+  "signature": "dbvm_ultimap_getDebugInfo(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "dbvm_watch_getstatus",
+  "signature": "dbvm_watch_getstatus(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "deallocateSharedMemory",
+  "signature": "deallocateSharedMemory(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "deallocateSharedMemoryLocal",
+  "signature": "deallocateSharedMemoryLocal(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "deAllocLocal",
+  "signature": "deAllocLocal(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "debug.debug",
+  "signature": "debug.debug()",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.gethook",
+  "signature": "debug.gethook([thread])",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.getinfo",
+  "signature": "debug.getinfo([thread,] f [, what])",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.getlocal",
+  "signature": "debug.getlocal([thread,] f, local)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.getmetatable",
+  "signature": "debug.getmetatable(value)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.getregistry",
+  "signature": "debug.getregistry()",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.getupvalue",
+  "signature": "debug.getupvalue(f, up)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.getuservalue",
+  "signature": "debug.getuservalue(u)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.sethook",
+  "signature": "debug.sethook([thread,] hook, mask [, count])",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.setlocal",
+  "signature": "debug.setlocal([thread,] level, local, value)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.setmetatable",
+  "signature": "debug.setmetatable(value, table)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.setupvalue",
+  "signature": "debug.setupvalue(f, up, value)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.setuservalue",
+  "signature": "debug.setuservalue(udata, value)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.traceback",
+  "signature": "debug.traceback([thread,] [message [, level]])",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.upvalueid",
+  "signature": "debug.upvalueid(f, n)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "debug.upvaluejoin",
+  "signature": "debug.upvaluejoin(f1, n1, f2, n2)",
+  "category": "debug 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "Disassembler",
+  "signature": "Disassembler -- 反汇编器 (createDisassembler)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Disassemblerview",
+  "signature": "Disassemblerview -- 反汇编视图",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "disassemblerview_getSelectedAddress",
+  "signature": "disassemblerview_getSelectedAddress(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "disassemblerview_onSelectionChange",
+  "signature": "disassemblerview_onSelectionChange(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "disassemblerview_setSelectedAddress",
+  "signature": "disassemblerview_setSelectedAddress(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "DisassemblerviewLine",
+  "signature": "DisassemblerviewLine -- 反汇编视图行",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "DissectCode",
+  "signature": "DissectCode -- 代码反汇编统计",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "DotNetDataCollector",
+  "signature": "DotNetDataCollector -- .NET 数据采集器",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "enumExports",
+  "signature": "enumExports(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "enumMemoryRegionsCR3",
+  "signature": "enumMemoryRegionsCR3(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "Event",
+  "signature": "Event -- 事件对象 (createEvent)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "FileStream",
+  "signature": "FileStream -- 文件流",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "FoundList",
+  "signature": "FoundList -- 扫描结果列表 (createFoundList)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "freeOnTerminate",
+  "signature": "freeOnTerminate(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "gc_setActivate",
+  "signature": "gc_setActivate(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "gdb_getCurrentInstructionPointer",
+  "signature": "gdb_getCurrentInstructionPointer(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "gdb_getcurrentstopreaon",
+  "signature": "gdb_getcurrentstopreaon(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "gdb_resumefrombreak",
+  "signature": "gdb_resumefrombreak(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "gdb_setCurrentInstructionPointer",
+  "signature": "gdb_setCurrentInstructionPointer(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "GenericHotkey",
+  "signature": "GenericHotkey -- 全局热键",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "getAutoRunPath",
+  "signature": "getAutoRunPath(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getCEName",
+  "signature": "getCEName(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getCommonModuleList",
+  "signature": "getCommonModuleList(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getCurrentThreadID",
+  "signature": "getCurrentThreadID(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getDebugContext",
+  "signature": "getDebugContext(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getElementCount",
+  "signature": "getElementCount(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "getNextReadablePageCR3",
+  "signature": "getNextReadablePageCR3(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getPageInfoCR3",
+  "signature": "getPageInfoCR3(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getPEB",
+  "signature": "getPEB(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getProcessList",
+  "signature": "getProcessList(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getTableEntry",
+  "signature": "getTableEntry(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getThreadList",
+  "signature": "getThreadList(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getWindowList",
+  "signature": "getWindowList(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "getXBox360ControllerKeyPress",
+  "signature": "getXBox360ControllerKeyPress(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "growMemoryRegion",
+  "signature": "growMemoryRegion(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "Hexadecimal",
+  "signature": "Hexadecimal -- 十六进制视图",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "hexadecimalview_getTopAddress",
+  "signature": "hexadecimalview_getTopAddress(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "hexadecimalview_onAddressChange",
+  "signature": "hexadecimalview_onAddressChange(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "hexadecimalview_onByteSelect",
+  "signature": "hexadecimalview_onByteSelect(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "hexadecimalview_setTopAddress",
+  "signature": "hexadecimalview_setTopAddress(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "ListColumn",
+  "signature": "ListColumn -- 列表列",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "ListColumns",
+  "signature": "ListColumns -- 列表列集合",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "ListItem",
+  "signature": "ListItem -- 列表项",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "ListItems",
+  "signature": "ListItems -- 列表项集合",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Listview",
+  "signature": "Listview -- 列表视图",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "loadCEServerExtension",
+  "signature": "loadCEServerExtension(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "lockMemory",
+  "signature": "lockMemory(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "LuaClientSocket",
+  "signature": "LuaClientSocket -- TCP 客户端",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "LuaPipe",
+  "signature": "LuaPipe -- 命名管道基类",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "LuaPipeClient",
+  "signature": "LuaPipeClient -- 命名管道客户端 (connectToPipe)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "LuaPipeServer",
+  "signature": "LuaPipeServer -- 命名管道服务端 (createPipe)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "LuaServerSocket",
+  "signature": "LuaServerSocket -- TCP 服务端",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "MainMenu",
+  "signature": "MainMenu -- 主菜单",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "math.acos",
+  "signature": "math.acos(x)",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.asin",
+  "signature": "math.asin(x)",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.atan",
+  "signature": "math.atan(y [, x])",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.cosh",
+  "signature": "math.cosh(x) -- CE 扩展",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.frexp",
+  "signature": "math.frexp(x) -- CE 扩展",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.ldexp",
+  "signature": "math.ldexp(m, e)",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.maxinteger",
+  "signature": "math.maxinteger -- 最大整数常量",
+  "category": "math 库",
+  "is_call": false,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.mininteger",
+  "signature": "math.mininteger -- 最小整数常量",
+  "category": "math 库",
+  "is_call": false,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.pow",
+  "signature": "math.pow(x, y)",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.sinh",
+  "signature": "math.sinh(x) -- CE 扩展",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.tanh",
+  "signature": "math.tanh(x) -- CE 扩展",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "math.ult",
+  "signature": "math.ult(m, n)",
+  "category": "math 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "MemoryRecordHotkey",
+  "signature": "MemoryRecordHotkey -- 内存记录热键",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "MemoryStream",
+  "signature": "MemoryStream -- 内存流",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Memoryview",
+  "signature": "Memoryview -- 内存视图",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "MemScan",
+  "signature": "MemScan -- 内存扫描对象 (createMemScan)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Menu",
+  "signature": "Menu -- 菜单",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "MenuItem",
+  "signature": "MenuItem -- 菜单项",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "MultiReadExclusiveWriteSynchronizer",
+  "signature": "MultiReadExclusiveWriteSynchronizer -- 多读单写同步器",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "object_destroy",
+  "signature": "object_destroy(...) -- CE LuaObject.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaObject.pas"
+ },
+ {
+  "name": "object_getClassName",
+  "signature": "object_getClassName(...) -- CE LuaObject.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaObject.pas"
+ },
+ {
+  "name": "onAutoGuess",
+  "signature": "onAutoGuess(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "openDialog_execute",
+  "signature": "openDialog_execute(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "openLuaServer",
+  "signature": "openLuaServer(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "os.setlocale",
+  "signature": "os.setlocale(locale [, category])",
+  "category": "os 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "Pagecontrol",
+  "signature": "Pagecontrol -- 分页控件",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "PaintBox",
+  "signature": "PaintBox -- 绘图面板",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "PopupMenu",
+  "signature": "PopupMenu -- 弹出菜单",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "ProgressBar",
+  "signature": "ProgressBar -- 进度条",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "rawlen",
+  "signature": "rawlen(v)",
+  "category": "语言基础",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "rdtsc",
+  "signature": "rdtsc(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "readByteLocal",
+  "signature": "readByteLocal(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "readShortIntegerLocal",
+  "signature": "readShortIntegerLocal(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "registerSpeedhackCallbacks",
+  "signature": "registerSpeedhackCallbacks(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "releaseDebugFiles",
+  "signature": "releaseDebugFiles(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "RemoteExecutor",
+  "signature": "RemoteExecutor -- 远程执行器",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "RemoteThread",
+  "signature": "RemoteThread -- 远程线程",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "restoreSeDebugPrivilege",
+  "signature": "restoreSeDebugPrivilege(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "RIPRelativeScanner",
+  "signature": "RIPRelativeScanner -- RIP 相对寻址扫描器",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Semaphore",
+  "signature": "Semaphore -- 信号量 (createSemaphore)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "sendMessageTimeout",
+  "signature": "sendMessageTimeout(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "setDebugContext",
+  "signature": "setDebugContext(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "setForceCR3VirtualQueryEx",
+  "signature": "setForceCR3VirtualQueryEx(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "setThreadSafetyCheck",
+  "signature": "setThreadSafetyCheck(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "Settings",
+  "signature": "Settings -- CE 设置对象",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "string.dump",
+  "signature": "string.dump(function [, strip])",
+  "category": "string 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "string.pack",
+  "signature": "string.pack(fmt, v1, ...)",
+  "category": "string 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "string.packsize",
+  "signature": "string.packsize(fmt)",
+  "category": "string 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "string.unpack",
+  "signature": "string.unpack(fmt, s [, pos])",
+  "category": "string 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "Stringlist",
+  "signature": "Stringlist -- 字符串列表",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Strings",
+  "signature": "Strings -- 字符串集合",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "StringStream",
+  "signature": "StringStream -- 字符串流",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Structure",
+  "signature": "Structure -- 结构体对象",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "structure_addElement",
+  "signature": "structure_addElement(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_addToGlobalStructureList",
+  "signature": "structure_addToGlobalStructureList(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_autoGuess",
+  "signature": "structure_autoGuess(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_beginUpdate",
+  "signature": "structure_beginUpdate(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_endUpdate",
+  "signature": "structure_endUpdate(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_getElement",
+  "signature": "structure_getElement(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_getElementByOffset",
+  "signature": "structure_getElementByOffset(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_getElementCount",
+  "signature": "structure_getElementCount(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_getName",
+  "signature": "structure_getName(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_getSize",
+  "signature": "structure_getSize(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_removeFromGlobalStructureList",
+  "signature": "structure_removeFromGlobalStructureList(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structure_setName",
+  "signature": "structure_setName(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "StructureElement",
+  "signature": "StructureElement -- 结构体元素",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "structureElement_getBytesize",
+  "signature": "structureElement_getBytesize(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_getChildStruct",
+  "signature": "structureElement_getChildStruct(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_getChildStructStart",
+  "signature": "structureElement_getChildStructStart(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_getName",
+  "signature": "structureElement_getName(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_getOffset",
+  "signature": "structureElement_getOffset(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_getOwnerStructure",
+  "signature": "structureElement_getOwnerStructure(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_getVartype",
+  "signature": "structureElement_getVartype(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_setBytesize",
+  "signature": "structureElement_setBytesize(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_setChildStruct",
+  "signature": "structureElement_setChildStruct(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_setChildStructStart",
+  "signature": "structureElement_setChildStructStart(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_setName",
+  "signature": "structureElement_setName(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_setOffset",
+  "signature": "structureElement_setOffset(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "structureElement_setVartype",
+  "signature": "structureElement_setVartype(...) -- CE LuaStructure.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaStructure.pas"
+ },
+ {
+  "name": "StructureFrm",
+  "signature": "StructureFrm -- 结构体窗口",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "suspend",
+  "signature": "suspend(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "SymbolList",
+  "signature": "SymbolList -- 符号列表",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "syncSymbolsNow",
+  "signature": "syncSymbolsNow(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "SynEdit",
+  "signature": "SynEdit -- SynEdit 编辑器控件",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "TableFile",
+  "signature": "TableFile -- 表文件",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "Thread",
+  "signature": "Thread -- 线程对象 (createThread)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "thread_freeOnTerminate",
+  "signature": "thread_freeOnTerminate(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "thread_synchronize",
+  "signature": "thread_synchronize(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "thread_waitfor",
+  "signature": "thread_waitfor(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "Timer",
+  "signature": "Timer -- 定时器对象 (createTimer)",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "TreeNode",
+  "signature": "TreeNode -- 树节点",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "TreeNodes",
+  "signature": "TreeNodes -- 树节点集合",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "try",
+  "signature": "try(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "unlockMemory",
+  "signature": "unlockMemory(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "utf8.char",
+  "signature": "utf8.char(...)",
+  "category": "utf8 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "utf8.charpattern",
+  "signature": "utf8.charpattern -- UTF-8 字符匹配模式",
+  "category": "utf8 库",
+  "is_call": false,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "utf8.codepoint",
+  "signature": "utf8.codepoint(s [, i [, j]])",
+  "category": "utf8 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "utf8.codes",
+  "signature": "utf8.codes(s)",
+  "category": "utf8 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "utf8.len",
+  "signature": "utf8.len(s [, i [, j]])",
+  "category": "utf8 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "utf8.offset",
+  "signature": "utf8.offset(s, n [, i])",
+  "category": "utf8 库",
+  "is_call": true,
+  "source": "lua/lua.pas (Lua 5.3)"
+ },
+ {
+  "name": "utf8ToAnsi",
+  "signature": "utf8ToAnsi(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "waitfor",
+  "signature": "waitfor(...) -- CE LuaThread.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaThread.pas"
+ },
+ {
+  "name": "waitforDotNet",
+  "signature": "waitforDotNet(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "waitforExports",
+  "signature": "waitforExports(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "waitforPDB",
+  "signature": "waitforPDB(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "writeByteLocal",
+  "signature": "writeByteLocal(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ },
+ {
+  "name": "WriteLog",
+  "signature": "WriteLog -- 日志对象",
+  "category": "对象",
+  "is_call": false,
+  "source": "celua.txt / LuaClass.pas"
+ },
+ {
+  "name": "writeShortIntegerLocal",
+  "signature": "writeShortIntegerLocal(...) -- CE LuaHandler.pas",
+  "category": "CE Lua API",
+  "is_call": true,
+  "source": "LuaHandler.pas"
+ }
+]

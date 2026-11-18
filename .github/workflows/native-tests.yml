@@ -1,0 +1,195 @@
+name: Native regression tests
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/Encoding.c'
+      - 'src/Encoding.h'
+      - 'src/uchardet/EncodingDetection.cpp'
+      - 'src/Dialogs.c'
+      - 'src/PathLib.c'
+      - 'src/PathLib.h'
+      - 'src/Notepad3.c'
+      - 'src/Config/Config.cpp'
+      - 'src/Edit.c'
+      - 'src/CeLint.c'
+      - 'src/CeLint.h'
+      - 'src/CeCompletion.c'
+      - 'src/CeCompletion.h'
+      - 'src/CeScript.c'
+      - 'src/CeScript.h'
+      - 'src/CeTemplate.c'
+      - 'src/CeHighlight.c'
+      - 'src/CeHighlight.h'
+      - 'src/CeDiagnostics.c'
+      - 'src/CeDiagnostics.h'
+      - 'src/CeSettings.c'
+      - 'lexilla/lexers_x/LexCe.cxx'
+      - 'test/TestCeHighlight.*'
+      - 'test/TestCeLuaScope.*'
+      - 'test/TestCeLintIntegration.*'
+      - 'test/TestCeCodeBlock.*'
+      # Generated completion data and its generator feed the CE harnesses.
+      - 'src/StyleLexers/ce_completions_data.*'
+      - 'tools/gen_ce_keywords.py'
+      - 'ce_edit/ce_edit/data/*.json'
+      - 'test/test_files/encoding/TestEncodingDetection.*'
+      - 'test/test_files/encoding/UTF-16/*.txt'
+      - 'test/TestOpenDialogDirectory.*'
+      - 'test/TestCreateDirectory.*'
+      - 'test/TestCeLint.*'
+      - 'test/TestCeCompletion.*'
+      - 'src/CeBridge.c'
+      - 'src/CeBridge.h'
+      - 'src/CeLua.c'
+      - 'src/CeLua.h'
+      - 'tools/gen_ce_source_api.py'
+      - 'ce_bridge/np3_ce_bridge.lua'
+      - 'test/TestCeBridge.*'
+      - 'test/TestCeBridgeLua.py'
+      - 'test/TestCeLuaRuntime.py'
+      # LSP client / shared protocol layer / built-in language server.
+      - 'src/CeLspJson.c'
+      - 'src/CeLspJson.h'
+      - 'src/CeLspFraming.c'
+      - 'src/CeLspFraming.h'
+      - 'src/CeLspPos.c'
+      - 'src/CeLspPos.h'
+      - 'src/CeLspClient.c'
+      - 'src/CeLspClient.h'
+      - 'src/CeLspFeatures.c'
+      - 'src/CeLspFeatures.h'
+      - 'ce_lsp_server/CeLspServer.c'
+      - 'ce_lsp_server/CeLspServer.vcxproj'
+      - 'test/TestCeLsp.*'
+      - 'test/TestCeLspList.*'
+      - '.github/workflows/native-tests.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'src/Encoding.c'
+      - 'src/Encoding.h'
+      - 'src/uchardet/EncodingDetection.cpp'
+      - 'src/Dialogs.c'
+      - 'src/PathLib.c'
+      - 'src/PathLib.h'
+      - 'src/Notepad3.c'
+      - 'src/Config/Config.cpp'
+      - 'src/Edit.c'
+      - 'src/CeLint.c'
+      - 'src/CeLint.h'
+      - 'src/CeCompletion.c'
+      - 'src/CeCompletion.h'
+      - 'src/CeScript.c'
+      - 'src/CeScript.h'
+      - 'src/CeTemplate.c'
+      - 'src/CeHighlight.c'
+      - 'src/CeHighlight.h'
+      - 'src/CeDiagnostics.c'
+      - 'src/CeDiagnostics.h'
+      - 'src/CeSettings.c'
+      - 'lexilla/lexers_x/LexCe.cxx'
+      - 'test/TestCeHighlight.*'
+      - 'test/TestCeLuaScope.*'
+      - 'test/TestCeLintIntegration.*'
+      - 'test/TestCeCodeBlock.*'
+      # Generated completion data and its generator feed the CE harnesses.
+      - 'src/StyleLexers/ce_completions_data.*'
+      - 'tools/gen_ce_keywords.py'
+      - 'ce_edit/ce_edit/data/*.json'
+      - 'test/test_files/encoding/TestEncodingDetection.*'
+      - 'test/test_files/encoding/UTF-16/*.txt'
+      - 'test/TestOpenDialogDirectory.*'
+      - 'test/TestCreateDirectory.*'
+      - 'test/TestCeLint.*'
+      - 'test/TestCeCompletion.*'
+      - 'src/CeBridge.c'
+      - 'src/CeBridge.h'
+      - 'src/CeLua.c'
+      - 'src/CeLua.h'
+      - 'tools/gen_ce_source_api.py'
+      - 'ce_bridge/np3_ce_bridge.lua'
+      - 'test/TestCeBridge.*'
+      - 'test/TestCeBridgeLua.py'
+      - 'test/TestCeLuaRuntime.py'
+      # LSP client / shared protocol layer / built-in language server.
+      - 'src/CeLspJson.c'
+      - 'src/CeLspJson.h'
+      - 'src/CeLspFraming.c'
+      - 'src/CeLspFraming.h'
+      - 'src/CeLspPos.c'
+      - 'src/CeLspPos.h'
+      - 'src/CeLspClient.c'
+      - 'src/CeLspClient.h'
+      - 'src/CeLspFeatures.c'
+      - 'src/CeLspFeatures.h'
+      - 'ce_lsp_server/CeLspServer.c'
+      - 'ce_lsp_server/CeLspServer.vcxproj'
+      - 'test/TestCeLsp.*'
+      - 'test/TestCeLspList.*'
+      - '.github/workflows/native-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Encoding regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\test_files\encoding\TestEncodingDetection.ps1
+
+      - name: Open-directory regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestOpenDialogDirectory.ps1
+
+      - name: Create-directory regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCreateDirectory.ps1
+
+      - name: CE lint/completion regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeLint.ps1
+
+      - name: CE LSP protocol regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeLsp.ps1
+
+      - name: CE LSP list builder regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeLspList.ps1
+
+      - name: CE completion acceptance regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeCompletion.ps1
+
+      - name: CE highlight / diagnostics regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeHighlight.ps1
+
+      - name: CE Lua scope / section marker regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeLuaScope.ps1
+
+      - name: CE lint pipeline regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeLintIntegration.ps1
+
+      - name: CE code block completion regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeCodeBlock.ps1
+
+      - name: CE bridge protocol regression
+        shell: pwsh
+        run: pwsh -NoProfile -File test\TestCeBridge.ps1
+
+      - name: CE local Lua runtime smoke
+        shell: pwsh
+        run: python test\TestCeLuaRuntime.py

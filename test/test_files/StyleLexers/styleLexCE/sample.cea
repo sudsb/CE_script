@@ -1,0 +1,39 @@
+-- Cheat Engine script lexer fixture
+-- Covers Lua, [ENABLE]/[DISABLE], Auto Assembler and inline C.
+-- Long comment: --[[ inside a normal line comment must stay a comment ]]
+
+[ENABLE]
+aobscanmodule(INJECT, game.exe, 48 8B 05 ?? ?? ?? ??)
+alloc(newmem, 0x1000)
+label(code)
+label(return)
+registersymbol(INJECT)
+
+newmem:
+  mov rax, [game.exe+1A2B3C4]
+  test eax, eax
+  je code
+  jmp return
+
+code:
+  mov eax, [rax+0x10]
+  db 90 90 ?? ??
+  jmp return
+
+return:
+  jmp INJECT+4
+
+{$lua}
+if syntaxcheck then return end
+local name = "test"
+print(name .. " ok")
+{$asm}
+
+{$ccode}
+#include <windows.h>
+int add(int a, int b) { return a + b; }
+{$asm}
+
+[DISABLE]
+unregistersymbol(INJECT)
+dealloc(newmem)

@@ -1,0 +1,3507 @@
+[
+ {
+  "category": "表脚本标记",
+  "name": "[ENABLE]",
+  "signature": "[ENABLE] -- 表脚本启用段"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "[DISABLE]",
+  "signature": "[DISABLE] -- 表脚本禁用段"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$lua}",
+  "signature": "{$lua} ... {$asm} -- 在 AA 中嵌入 Lua"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$asm}",
+  "signature": "{$asm} -- 切回 Auto Assembler 汇编块"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$ccode}",
+  "signature": "{$ccode} ... {$asm} -- 嵌入 C 代码"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$c}",
+  "signature": "{$c} ... {$asm} -- {$ccode} 的简写，嵌入 C 代码"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$code}",
+  "signature": "{$code} ... {$asm} -- 嵌入 C 代码块"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$CODE}",
+  "signature": "{$CODE} ... {$asm} -- 嵌入 C 代码块（默认调用约定）"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$STDCALL}",
+  "signature": "{$STDCALL} ... {$asm} -- 嵌入 stdcall 调用约定的 C 代码块"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "{$fastcode}",
+  "signature": "{$fastcode} ... {$asm} -- 嵌入快速调用的 C 代码块"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "define",
+  "signature": "define(名称, 值) -- AA 宏定义"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "alloc",
+  "signature": "alloc(名称, 大小) -- AA 分配内存"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "label",
+  "signature": "label(名称) -- AA 标签"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "registersymbol",
+  "signature": "registersymbol(名称) -- 注册符号"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "unregistersymbol",
+  "signature": "unregistersymbol(名称)"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "dealloc",
+  "signature": "dealloc(名称) -- 释放 AA 分配"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "fullaccess",
+  "signature": "fullaccess(地址, 大小) -- 改内存保护"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "aobscan",
+  "signature": "aobscan(名称, 特征码) -- AA 扫描"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "globalalloc",
+  "signature": "globalalloc(名称, 大小)"
+ },
+ {
+  "category": "表脚本标记",
+  "name": "include",
+  "signature": "include(文件名) -- 包含 AA 文件"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "function",
+  "signature": "function 名称(参数) ... end"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "end",
+  "signature": "end -- 结束 block"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "then",
+  "signature": "then -- if/for 等块起始"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "do",
+  "signature": "do ... end -- 代码块"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "else",
+  "signature": "else -- 否则"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "elseif",
+  "signature": "elseif 条件 then"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "if",
+  "signature": "if 条件 then ... end"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "for",
+  "signature": "for i=起,终,步 do ... end"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "while",
+  "signature": "while 条件 do ... end"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "repeat",
+  "signature": "repeat ... until 条件"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "until",
+  "signature": "until 条件 -- repeat 结束"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "local",
+  "signature": "local 变量 = 值"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "return",
+  "signature": "return 值"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "and",
+  "signature": "and -- 逻辑与"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "or",
+  "signature": "or -- 逻辑或"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "not",
+  "signature": "not -- 逻辑非"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "nil",
+  "signature": "nil -- 空值"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "true",
+  "signature": "true -- 真"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "false",
+  "signature": "false -- 假"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "in",
+  "signature": "in -- for ... in"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "break",
+  "signature": "break -- 跳出循环"
+ },
+ {
+  "category": "Lua 关键字",
+  "name": "goto",
+  "signature": "goto 标签"
+ },
+ {
+  "category": "内存读写",
+  "name": "readBytes",
+  "signature": "readBytes(address, size[, returnAsTable])"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeBytes",
+  "signature": "writeBytes(address, ...)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readByte",
+  "signature": "readByte(address)"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeByte",
+  "signature": "writeByte(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readWord",
+  "signature": "readWord(address)"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeWord",
+  "signature": "writeWord(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readSmallInteger",
+  "signature": "readSmallInteger(address[, signed])"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeSmallInteger",
+  "signature": "writeSmallInteger(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readInteger",
+  "signature": "readInteger(address[, signed])"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeInteger",
+  "signature": "writeInteger(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readQword",
+  "signature": "readQword(address)"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeQword",
+  "signature": "writeQword(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readPointer",
+  "signature": "readPointer(address)"
+ },
+ {
+  "category": "内存读写",
+  "name": "writePointer",
+  "signature": "writePointer(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readFloat",
+  "signature": "readFloat(address)"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeFloat",
+  "signature": "writeFloat(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readDouble",
+  "signature": "readDouble(address)"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeDouble",
+  "signature": "writeDouble(address, value)"
+ },
+ {
+  "category": "内存读写",
+  "name": "readString",
+  "signature": "readString(address, size[, isWide])"
+ },
+ {
+  "category": "内存读写",
+  "name": "writeString",
+  "signature": "writeString(address, text[, isWide])"
+ },
+ {
+  "category": "内存读写",
+  "name": "getAddress",
+  "signature": "getAddress(addressstring)"
+ },
+ {
+  "category": "内存读写",
+  "name": "getNameFromAddress",
+  "signature": "getNameFromAddress(address)"
+ },
+ {
+  "category": "内存读写",
+  "name": "getAddressFromName",
+  "signature": "getAddressFromName(symbolname)"
+ },
+ {
+  "category": "内存读写",
+  "name": "getAddressList",
+  "signature": "getAddressList()"
+ },
+ {
+  "category": "内存读写",
+  "name": "getMemoryRecordByID",
+  "signature": "getMemoryRecordByID(id)"
+ },
+ {
+  "category": "内存读写",
+  "name": "getMemoryRecordByDescription",
+  "signature": "getMemoryRecordByDescription(desc)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readBytesLocal",
+  "signature": "readBytesLocal(address, size[, returnAsTable])"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writeBytesLocal",
+  "signature": "writeBytesLocal(address, ...)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readSmallIntegerLocal",
+  "signature": "readSmallIntegerLocal(address)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writeSmallIntegerLocal",
+  "signature": "writeSmallIntegerLocal(address, value)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readIntegerLocal",
+  "signature": "readIntegerLocal(address)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writeIntegerLocal",
+  "signature": "writeIntegerLocal(address, value)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readQwordLocal",
+  "signature": "readQwordLocal(address)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writeQwordLocal",
+  "signature": "writeQwordLocal(address, value)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readPointerLocal",
+  "signature": "readPointerLocal(address)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writePointerLocal",
+  "signature": "writePointerLocal(address, value)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readFloatLocal",
+  "signature": "readFloatLocal(address)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writeFloatLocal",
+  "signature": "writeFloatLocal(address, value)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readDoubleLocal",
+  "signature": "readDoubleLocal(address)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writeDoubleLocal",
+  "signature": "writeDoubleLocal(address, value)"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "readStringLocal",
+  "signature": "readStringLocal(address, size[, isWide])"
+ },
+ {
+  "category": "CE 自身内存",
+  "name": "writeStringLocal",
+  "signature": "writeStringLocal(address, text[, isWide])"
+ },
+ {
+  "category": "数据转换",
+  "name": "wordToByteTable",
+  "signature": "wordToByteTable(number)"
+ },
+ {
+  "category": "数据转换",
+  "name": "dwordToByteTable",
+  "signature": "dwordToByteTable(number)"
+ },
+ {
+  "category": "数据转换",
+  "name": "qwordToByteTable",
+  "signature": "qwordToByteTable(number)"
+ },
+ {
+  "category": "数据转换",
+  "name": "floatToByteTable",
+  "signature": "floatToByteTable(number)"
+ },
+ {
+  "category": "数据转换",
+  "name": "doubleToByteTable",
+  "signature": "doubleToByteTable(number)"
+ },
+ {
+  "category": "数据转换",
+  "name": "extendedToByteTable",
+  "signature": "extendedToByteTable(number)"
+ },
+ {
+  "category": "数据转换",
+  "name": "stringToByteTable",
+  "signature": "stringToByteTable(string)"
+ },
+ {
+  "category": "数据转换",
+  "name": "wideStringToByteTable",
+  "signature": "wideStringToByteTable(string)"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToWord",
+  "signature": "byteTableToWord(table[, signed])"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToDword",
+  "signature": "byteTableToDword(table[, signed])"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToQword",
+  "signature": "byteTableToQword(table)"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToFloat",
+  "signature": "byteTableToFloat(table)"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToDouble",
+  "signature": "byteTableToDouble(table)"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToExtended",
+  "signature": "byteTableToExtended(table)"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToString",
+  "signature": "byteTableToString(table)"
+ },
+ {
+  "category": "数据转换",
+  "name": "byteTableToWideString",
+  "signature": "byteTableToWideString(table)"
+ },
+ {
+  "category": "数据转换",
+  "name": "signExtend",
+  "signature": "signExtend(value, mostSignificantBit)"
+ },
+ {
+  "category": "位运算",
+  "name": "bOr",
+  "signature": "bOr(int1, int2)"
+ },
+ {
+  "category": "位运算",
+  "name": "bXor",
+  "signature": "bXor(int1, int2)"
+ },
+ {
+  "category": "位运算",
+  "name": "bAnd",
+  "signature": "bAnd(int1, int2)"
+ },
+ {
+  "category": "位运算",
+  "name": "bShl",
+  "signature": "bShl(int, count)"
+ },
+ {
+  "category": "位运算",
+  "name": "bShr",
+  "signature": "bShr(int, count)"
+ },
+ {
+  "category": "位运算",
+  "name": "bNot",
+  "signature": "bNot(int)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getAddress",
+  "signature": "getAddress(string[, local])"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getAddressSafe",
+  "signature": "getAddressSafe(string[, local][, shallow])"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getNameFromAddress",
+  "signature": "getNameFromAddress(address)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getAddressFromName",
+  "signature": "getAddressFromName(symbolname)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getProcessIDFromProcessName",
+  "signature": "getProcessIDFromProcessName(name)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getProcessNameFromID",
+  "signature": "getProcessNameFromID(id)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getOpenProcessID",
+  "signature": "getOpenProcessID()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "openProcess",
+  "signature": "openProcess(processid)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "enumModules",
+  "signature": "enumModules([processid])"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getModuleByAddress",
+  "signature": "getModuleByAddress(address)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getModuleSize",
+  "signature": "getModuleSize(modulename)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getSymbolInfo",
+  "signature": "getSymbolInfo(symbolname)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getRTTIClassName",
+  "signature": "getRTTIClassName(address)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "registerSymbol",
+  "signature": "registerSymbol(symbolname, address)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "unregisterSymbol",
+  "signature": "unregisterSymbol(symbolname)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "reinitializeSymbolhandler",
+  "signature": "reinitializeSymbolhandler([wait])"
+ },
+ {
+  "category": "符号/进程",
+  "name": "enableWindowsSymbols",
+  "signature": "enableWindowsSymbols()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "enableKernelSymbols",
+  "signature": "enableKernelSymbols()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "waitForSections",
+  "signature": "waitForSections()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "waitForExports",
+  "signature": "waitForExports()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "waitForDotNet",
+  "signature": "waitForDotNet()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "waitForPDB",
+  "signature": "waitForPDB()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "inModule",
+  "signature": "inModule(address)"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getCEVersion",
+  "signature": "getCEVersion()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "getCheatEngineDir",
+  "signature": "getCheatEngineDir()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "cheatEngineIs64Bit",
+  "signature": "cheatEngineIs64Bit()"
+ },
+ {
+  "category": "符号/进程",
+  "name": "cheatEngineIsBeta",
+  "signature": "cheatEngineIsBeta()"
+ },
+ {
+  "category": "扫描",
+  "name": "AOBScan",
+  "signature": "AOBScan(addressstring)"
+ },
+ {
+  "category": "扫描",
+  "name": "AOBScanAndReplace",
+  "signature": "AOBScanAndReplace(aob, ...)"
+ },
+ {
+  "category": "扫描",
+  "name": "AOBScanRegion",
+  "signature": "AOBScanRegion(start, stop, pattern)"
+ },
+ {
+  "category": "扫描",
+  "name": "AOBScanModule",
+  "signature": "AOBScanModule(module, pattern)"
+ },
+ {
+  "category": "扫描",
+  "name": "AOBScanModuleAndReplace",
+  "signature": "AOBScanModuleAndReplace(module, ...)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "autoAssemble",
+  "signature": "autoAssemble(text[, targetself][, disableInfo])"
+ },
+ {
+  "category": "自动汇编",
+  "name": "autoAssembleCheck",
+  "signature": "autoAssembleCheck(text, enable[, targetself])"
+ },
+ {
+  "category": "自动汇编",
+  "name": "assemble",
+  "signature": "assemble(address, instruction)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "disassemble",
+  "signature": "disassemble(address)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "executeCode",
+  "signature": "executeCode(address, ...)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "executeCodeEx",
+  "signature": "executeCodeEx(address, ...)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "generateCode",
+  "signature": "generateCode(...) -- 生成注入代码"
+ },
+ {
+  "category": "自动汇编",
+  "name": "generateAPIHookScript",
+  "signature": "generateAPIHookScript(address, jumpto[, getaddress][, ext][, targetself])"
+ },
+ {
+  "category": "自动汇编",
+  "name": "registerAutoAssemblerCommand",
+  "signature": "registerAutoAssemblerCommand(command, function)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "unregisterAutoAssemblerCommand",
+  "signature": "unregisterAutoAssemblerCommand(command)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "compile",
+  "signature": "compile(text[, address][, targetself][, kernelmode][, nodebug])"
+ },
+ {
+  "category": "自动汇编",
+  "name": "compileFiles",
+  "signature": "compileFiles({filelist}[, address][, targetself])"
+ },
+ {
+  "category": "自动汇编",
+  "name": "compileCS",
+  "signature": "compileCS(text, {references}[, coreAssembly])"
+ },
+ {
+  "category": "自动汇编",
+  "name": "dotNetExecuteClassMethod",
+  "signature": "dotNetExecuteClassMethod(dll, namespace, class, method, params)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "addCIncludePath",
+  "signature": "addCIncludePath(path)"
+ },
+ {
+  "category": "自动汇编",
+  "name": "removeCIncludePath",
+  "signature": "removeCIncludePath(path)"
+ },
+ {
+  "category": "地址列表",
+  "name": "getAddressList",
+  "signature": "getAddressList()"
+ },
+ {
+  "category": "地址列表",
+  "name": "createMemoryRecord",
+  "signature": "al.createMemoryRecord()"
+ },
+ {
+  "category": "地址列表",
+  "name": "getMemoryRecordByID",
+  "signature": "al.getMemoryRecordByID(id)"
+ },
+ {
+  "category": "地址列表",
+  "name": "getMemoryRecordByDescription",
+  "signature": "al.getMemoryRecordByDescription(desc)"
+ },
+ {
+  "category": "地址列表",
+  "name": "getMemoryRecord",
+  "signature": "al.getMemoryRecord(index)"
+ },
+ {
+  "category": "地址列表",
+  "name": "getCount",
+  "signature": "al.getCount()"
+ },
+ {
+  "category": "地址列表",
+  "name": "deleteMemoryRecord",
+  "signature": "al.deleteMemoryRecord(index)"
+ },
+ {
+  "category": "内存记录",
+  "name": "setDescription",
+  "signature": "mr.setDescription(text)"
+ },
+ {
+  "category": "内存记录",
+  "name": "getDescription",
+  "signature": "mr.getDescription()"
+ },
+ {
+  "category": "内存记录",
+  "name": "setAddress",
+  "signature": "mr.setAddress(address)"
+ },
+ {
+  "category": "内存记录",
+  "name": "getAddress",
+  "signature": "mr.getAddress()"
+ },
+ {
+  "category": "内存记录",
+  "name": "setType",
+  "signature": "mr.setType(vtType)"
+ },
+ {
+  "category": "内存记录",
+  "name": "getType",
+  "signature": "mr.getType()"
+ },
+ {
+  "category": "内存记录",
+  "name": "setValue",
+  "signature": "mr.setValue(value)"
+ },
+ {
+  "category": "内存记录",
+  "name": "getValue",
+  "signature": "mr.getValue()"
+ },
+ {
+  "category": "内存记录",
+  "name": "setScript",
+  "signature": "mr.setScript(text)"
+ },
+ {
+  "category": "内存记录",
+  "name": "getScript",
+  "signature": "mr.getScript()"
+ },
+ {
+  "category": "内存记录",
+  "name": "setColor",
+  "signature": "mr.setColor(color)"
+ },
+ {
+  "category": "内存记录",
+  "name": "getColor",
+  "signature": "mr.getColor()"
+ },
+ {
+  "category": "内存记录",
+  "name": "setOffset",
+  "signature": "mr.setOffset(hexstring)"
+ },
+ {
+  "category": "内存记录",
+  "name": "getOffset",
+  "signature": "mr.getOffset()"
+ },
+ {
+  "category": "内存记录属性",
+  "name": "Active",
+  "signature": "mr.Active = true -- 是否激活"
+ },
+ {
+  "category": "内存记录属性",
+  "name": "Offset",
+  "signature": "mr.Offset = '+0x10'"
+ },
+ {
+  "category": "内存记录属性",
+  "name": "ClassName",
+  "signature": "mr.ClassName -- 对应结构类名"
+ },
+ {
+  "category": "内存记录属性",
+  "name": "Script",
+  "signature": "mr.Script -- AA 脚本"
+ },
+ {
+  "category": "对象",
+  "name": "AddressList",
+  "signature": "AddressList -- 地址列表全局对象"
+ },
+ {
+  "category": "对象",
+  "name": "MemoryRecord",
+  "signature": "MemoryRecord -- 内存记录对象"
+ },
+ {
+  "category": "值类型",
+  "name": "vtByte",
+  "signature": "vtByte -- 字节"
+ },
+ {
+  "category": "值类型",
+  "name": "vtWord",
+  "signature": "vtWord -- 双字节"
+ },
+ {
+  "category": "值类型",
+  "name": "vtDword",
+  "signature": "vtDword -- 4 字节"
+ },
+ {
+  "category": "值类型",
+  "name": "vtQword",
+  "signature": "vtQword -- 8 字节"
+ },
+ {
+  "category": "值类型",
+  "name": "vtSingle",
+  "signature": "vtSingle -- 单精度浮点"
+ },
+ {
+  "category": "值类型",
+  "name": "vtDouble",
+  "signature": "vtDouble -- 双精度浮点"
+ },
+ {
+  "category": "值类型",
+  "name": "vtString",
+  "signature": "vtString -- 字符串"
+ },
+ {
+  "category": "值类型",
+  "name": "vtByteArray",
+  "signature": "vtByteArray -- 字节数组"
+ },
+ {
+  "category": "值类型",
+  "name": "vtBinary",
+  "signature": "vtBinary -- 二进制"
+ },
+ {
+  "category": "值类型",
+  "name": "vtPointer",
+  "signature": "vtPointer -- 指针"
+ },
+ {
+  "category": "值类型",
+  "name": "vtCustom",
+  "signature": "vtCustom -- 自定义类型"
+ },
+ {
+  "category": "窗体",
+  "name": "createForm",
+  "signature": "createForm(owner)"
+ },
+ {
+  "category": "窗体",
+  "name": "createFormFromFile",
+  "signature": "createFormFromFile(filename)"
+ },
+ {
+  "category": "窗体",
+  "name": "getMainForm",
+  "signature": "getMainForm()"
+ },
+ {
+  "category": "窗体",
+  "name": "getForm",
+  "signature": "getForm(formid)"
+ },
+ {
+  "category": "窗体",
+  "name": "MainForm",
+  "signature": "MainForm -- 主窗口对象"
+ },
+ {
+  "category": "控件",
+  "name": "createButton",
+  "signature": "createButton(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createLabel",
+  "signature": "createLabel(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createEdit",
+  "signature": "createEdit(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createGroupBox",
+  "signature": "createGroupBox(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createCheckBox",
+  "signature": "createCheckBox(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createComboBox",
+  "signature": "createComboBox(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createListBox",
+  "signature": "createListBox(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createMemo",
+  "signature": "createMemo(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createPanel",
+  "signature": "createPanel(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createProgressBar",
+  "signature": "createProgressBar(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createTrackBar",
+  "signature": "createTrackBar(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createTable",
+  "signature": "createTable(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createTabControl",
+  "signature": "createTabControl(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createPageControl",
+  "signature": "createPageControl(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createTreeView",
+  "signature": "createTreeView(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createListView",
+  "signature": "createListView(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createUpDown",
+  "signature": "createUpDown(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createImage",
+  "signature": "createImage(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createSplitter",
+  "signature": "createSplitter(parent, owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createMemoryView",
+  "signature": "createMemoryView(owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createDisassemblerView",
+  "signature": "createDisassemblerView(owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createHexadecimalView",
+  "signature": "createHexadecimalView(owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createStackView",
+  "signature": "createStackView(owner)"
+ },
+ {
+  "category": "控件",
+  "name": "createFont",
+  "signature": "createFont()"
+ },
+ {
+  "category": "控件属性",
+  "name": "Caption",
+  "signature": "control.Caption = '文本'"
+ },
+ {
+  "category": "控件属性",
+  "name": "Text",
+  "signature": "control.Text = '内容'"
+ },
+ {
+  "category": "控件属性",
+  "name": "Left",
+  "signature": "control.Left = 10"
+ },
+ {
+  "category": "控件属性",
+  "name": "Top",
+  "signature": "control.Top = 10"
+ },
+ {
+  "category": "控件属性",
+  "name": "Width",
+  "signature": "control.Width = 100"
+ },
+ {
+  "category": "控件属性",
+  "name": "Height",
+  "signature": "control.Height = 24"
+ },
+ {
+  "category": "控件属性",
+  "name": "Visible",
+  "signature": "control.Visible = true"
+ },
+ {
+  "category": "控件属性",
+  "name": "Enabled",
+  "signature": "control.Enabled = true"
+ },
+ {
+  "category": "控件属性",
+  "name": "Color",
+  "signature": "control.Color = 0xFFFFFF"
+ },
+ {
+  "category": "控件属性",
+  "name": "Font",
+  "signature": "control.Font.Size = 12"
+ },
+ {
+  "category": "控件属性",
+  "name": "Align",
+  "signature": "control.Align = alTop"
+ },
+ {
+  "category": "控件属性",
+  "name": "Hint",
+  "signature": "control.Hint = '提示'"
+ },
+ {
+  "category": "控件属性",
+  "name": "Name",
+  "signature": "control.Name = 'btn1'"
+ },
+ {
+  "category": "控件属性",
+  "name": "Parent",
+  "signature": "control.Parent = form"
+ },
+ {
+  "category": "控件属性",
+  "name": "AutoSize",
+  "signature": "control.AutoSize = true"
+ },
+ {
+  "category": "控件属性",
+  "name": "ReadOnly",
+  "signature": "control.ReadOnly = false"
+ },
+ {
+  "category": "控件属性",
+  "name": "Items",
+  "signature": "control.Items.add('项')"
+ },
+ {
+  "category": "控件属性",
+  "name": "Lines",
+  "signature": "control.Lines.add('行')"
+ },
+ {
+  "category": "控件属性",
+  "name": "Checked",
+  "signature": "control.Checked = true"
+ },
+ {
+  "category": "控件属性",
+  "name": "Position",
+  "signature": "control.Position = 50"
+ },
+ {
+  "category": "控件属性",
+  "name": "Min",
+  "signature": "control.Min = 0"
+ },
+ {
+  "category": "控件属性",
+  "name": "Max",
+  "signature": "control.Max = 100"
+ },
+ {
+  "category": "控件属性",
+  "name": "OnClick",
+  "signature": "control.OnClick = function(sender) ... end"
+ },
+ {
+  "category": "控件属性",
+  "name": "OnChange",
+  "signature": "control.OnChange = function(sender) ... end"
+ },
+ {
+  "category": "控件属性",
+  "name": "OnKeyDown",
+  "signature": "control.OnKeyDown = function(sender, key) ... end"
+ },
+ {
+  "category": "控件属性",
+  "name": "Show",
+  "signature": "form.Show()"
+ },
+ {
+  "category": "控件属性",
+  "name": "Hide",
+  "signature": "form.Hide()"
+ },
+ {
+  "category": "控件属性",
+  "name": "Free",
+  "signature": "form.Free()"
+ },
+ {
+  "category": "Timer",
+  "name": "createTimer",
+  "signature": "createTimer(owner[, function])"
+ },
+ {
+  "category": "Timer 属性",
+  "name": "Interval",
+  "signature": "timer.Interval = 1000 -- 毫秒"
+ },
+ {
+  "category": "Timer 属性",
+  "name": "OnTimer",
+  "signature": "timer.OnTimer = function(t) ... end"
+ },
+ {
+  "category": "Timer 属性",
+  "name": "Enabled",
+  "signature": "timer.Enabled = true"
+ },
+ {
+  "category": "Timer 属性",
+  "name": "destroy",
+  "signature": "timer.destroy()"
+ },
+ {
+  "category": "调试",
+  "name": "debugProcess",
+  "signature": "debugProcess(processid)"
+ },
+ {
+  "category": "调试",
+  "name": "debug_setBreakpoint",
+  "signature": "debug_setBreakpoint(address[, size][, trigger])"
+ },
+ {
+  "category": "调试",
+  "name": "debug_removeBreakpoint",
+  "signature": "debug_removeBreakpoint(address)"
+ },
+ {
+  "category": "调试",
+  "name": "debug_continueFromBreakpoint",
+  "signature": "debug_continueFromBreakpoint(action)"
+ },
+ {
+  "category": "调试",
+  "name": "debugger_onBreakpoint",
+  "signature": "debugger_onBreakpoint -- 断点回调"
+ },
+ {
+  "category": "调试",
+  "name": "onBreakpoint",
+  "signature": "onBreakpoint -- 全局断点函数"
+ },
+ {
+  "category": "调试",
+  "name": "getThreadContext",
+  "signature": "getThreadContext(threadid)"
+ },
+ {
+  "category": "调试",
+  "name": "setThreadContext",
+  "signature": "setThreadContext(threadid, context)"
+ },
+ {
+  "category": "线程",
+  "name": "createThread",
+  "signature": "createThread(function)"
+ },
+ {
+  "category": "线程",
+  "name": "thread.synchronize",
+  "signature": "thread.synchronize(function)"
+ },
+ {
+  "category": "线程",
+  "name": "thread.suspend",
+  "signature": "thread.suspend()"
+ },
+ {
+  "category": "线程",
+  "name": "thread.resume",
+  "signature": "thread.resume()"
+ },
+ {
+  "category": "线程",
+  "name": "thread.terminate",
+  "signature": "thread.terminate()"
+ },
+ {
+  "category": "线程",
+  "name": "thread.waitFor",
+  "signature": "thread.waitFor()"
+ },
+ {
+  "category": "线程",
+  "name": "thread.freeOnTerminate",
+  "signature": "thread.freeOnTerminate = true"
+ },
+ {
+  "category": "线程",
+  "name": "thread.Name",
+  "signature": "thread.Name = 't1'"
+ },
+ {
+  "category": "内存区域",
+  "name": "enumMemoryRegions",
+  "signature": "enumMemoryRegions()"
+ },
+ {
+  "category": "内存区域",
+  "name": "writeRegionToFile",
+  "signature": "writeRegionToFile(filename, source, size)"
+ },
+ {
+  "category": "内存区域",
+  "name": "readRegionFromFile",
+  "signature": "readRegionFromFile(filename, dest)"
+ },
+ {
+  "category": "内存区域",
+  "name": "copyMemory",
+  "signature": "copyMemory(src, size[, dest][, method])"
+ },
+ {
+  "category": "内存区域",
+  "name": "compareMemory",
+  "signature": "compareMemory(a1, a2, size[, method])"
+ },
+ {
+  "category": "内存区域",
+  "name": "virtualQueryEx",
+  "signature": "virtualQueryEx(handle, address)"
+ },
+ {
+  "category": "内存区域",
+  "name": "virtualProtectEx",
+  "signature": "virtualProtectEx(handle, address, size, prot)"
+ },
+ {
+  "category": "内存区域",
+  "name": "readRegion",
+  "signature": "readRegion(address, size)"
+ },
+ {
+  "category": "内存区域",
+  "name": "writeRegion",
+  "signature": "writeRegion(address, data)"
+ },
+ {
+  "category": "属性访问",
+  "name": "getProperty",
+  "signature": "getProperty(object, propertyname)"
+ },
+ {
+  "category": "属性访问",
+  "name": "setProperty",
+  "signature": "setProperty(object, propertyname, value)"
+ },
+ {
+  "category": "属性访问",
+  "name": "getPropertyList",
+  "signature": "getPropertyList(object)"
+ },
+ {
+  "category": "对象引用",
+  "name": "createRef",
+  "signature": "createRef(...)"
+ },
+ {
+  "category": "对象引用",
+  "name": "getRef",
+  "signature": "getRef(integer)"
+ },
+ {
+  "category": "对象引用",
+  "name": "destroyRef",
+  "signature": "destroyRef(integer)"
+ },
+ {
+  "category": "对象引用",
+  "name": "encodeFunction",
+  "signature": "encodeFunction(function)"
+ },
+ {
+  "category": "对象引用",
+  "name": "decodeFunction",
+  "signature": "decodeFunction(string)"
+ },
+ {
+  "category": "对象引用",
+  "name": "luaclass_newClass",
+  "signature": "luaclass_newClass()"
+ },
+ {
+  "category": "文件",
+  "name": "getFileList",
+  "signature": "getFileList(path[, mask][, subdir][, attrib])"
+ },
+ {
+  "category": "文件",
+  "name": "getDirectoryList",
+  "signature": "getDirectoryList(path[, subdir])"
+ },
+ {
+  "category": "文件",
+  "name": "extractFileName",
+  "signature": "extractFileName(filepath)"
+ },
+ {
+  "category": "文件",
+  "name": "extractFileExt",
+  "signature": "extractFileExt(filepath)"
+ },
+ {
+  "category": "文件",
+  "name": "extractFileNameWithoutExt",
+  "signature": "extractFileNameWithoutExt(filepath)"
+ },
+ {
+  "category": "文件",
+  "name": "extractFilePath",
+  "signature": "extractFilePath(filepath)"
+ },
+ {
+  "category": "文件",
+  "name": "getTempFolder",
+  "signature": "getTempFolder()"
+ },
+ {
+  "category": "文件",
+  "name": "fileExists",
+  "signature": "fileExists(path)"
+ },
+ {
+  "category": "文件",
+  "name": "deleteFile",
+  "signature": "deleteFile(path)"
+ },
+ {
+  "category": "文件",
+  "name": "getFileVersion",
+  "signature": "getFileVersion(path)"
+ },
+ {
+  "category": "文件",
+  "name": "md5file",
+  "signature": "md5file(path)"
+ },
+ {
+  "category": "文件",
+  "name": "loadTable",
+  "signature": "loadTable(filename[, merge])"
+ },
+ {
+  "category": "文件",
+  "name": "saveTable",
+  "signature": "saveTable(filename[, protect][, dontDeactivate])"
+ },
+ {
+  "category": "工具",
+  "name": "showMessage",
+  "signature": "showMessage(text)"
+ },
+ {
+  "category": "工具",
+  "name": "messageDialog",
+  "signature": "messageDialog(message, caption, type)"
+ },
+ {
+  "category": "工具",
+  "name": "sleep",
+  "signature": "sleep(milliseconds)"
+ },
+ {
+  "category": "工具",
+  "name": "beep",
+  "signature": "beep()"
+ },
+ {
+  "category": "工具",
+  "name": "print",
+  "signature": "print(...)"
+ },
+ {
+  "category": "工具",
+  "name": "writeToClipboard",
+  "signature": "writeToClipboard(text)"
+ },
+ {
+  "category": "工具",
+  "name": "readFromClipboard",
+  "signature": "readFromClipboard()"
+ },
+ {
+  "category": "工具",
+  "name": "getOperatingSystem",
+  "signature": "getOperatingSystem()"
+ },
+ {
+  "category": "工具",
+  "name": "darkMode",
+  "signature": "darkMode() -- 是否暗色"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_enumDomains",
+  "signature": "mono_enumDomains()"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_enumAssemblies",
+  "signature": "mono_enumAssemblies()"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_image_enumClasses",
+  "signature": "mono_image_enumClasses(image)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_enumFields",
+  "signature": "mono_class_enumFields(class, includeParents, expandedStructs)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_enumMethods",
+  "signature": "mono_class_enumMethods(class, includeParents)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_compile_method",
+  "signature": "mono_compile_method(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_invoke_method",
+  "signature": "mono_invoke_method(domain, method, object, args)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_object_new",
+  "signature": "mono_object_new(klass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "LaunchMonoDataCollector",
+  "signature": "LaunchMonoDataCollector()"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "monoTypeToVarType",
+  "signature": "monoTypeToVarType(monoType)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_setCurrentDomain",
+  "signature": "mono_setCurrentDomain(domain)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_getImageFromAssembly",
+  "signature": "mono_getImageFromAssembly(assembly)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_image_get_name",
+  "signature": "mono_image_get_name(image)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_object_getClass",
+  "signature": "mono_object_getClass(address)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_image_findClass",
+  "signature": "mono_image_findClass(image, namespace, classname)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_findClass",
+  "signature": "mono_findClass(namespace, classname)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getName",
+  "signature": "mono_class_getName(class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getNamespace",
+  "signature": "mono_class_getNamespace(class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getParent",
+  "signature": "mono_class_getParent(class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getStaticFieldAddress",
+  "signature": "mono_class_getStaticFieldAddress(domain, class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_findMethod",
+  "signature": "mono_class_findMethod(class, methodname)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_getJitInfo",
+  "signature": "mono_getJitInfo(address)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_free_method",
+  "signature": "mono_free_method(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_findMethod",
+  "signature": "mono_findMethod(namespace, classname, methodname, parameters)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_getName",
+  "signature": "mono_method_getName(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_getHeader",
+  "signature": "mono_method_getHeader(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_getSignature",
+  "signature": "mono_method_getSignature(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_disassemble",
+  "signature": "mono_method_disassemble(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_getClass",
+  "signature": "mono_method_getClass(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_methodheader_getILCode",
+  "signature": "mono_methodheader_getILCode(methodheader)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_getILCodeFromMethod",
+  "signature": "mono_getILCodeFromMethod(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_loadAssemblyFromFile",
+  "signature": "mono_loadAssemblyFromFile(fname)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_initialize",
+  "signature": "mono_initialize()"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_enumImagesEx",
+  "signature": "mono_enumImagesEx(domain)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_enumImages",
+  "signature": "mono_enumImages(onImage)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_image_enumClassesEx",
+  "signature": "mono_image_enumClassesEx(image)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_image_get_filename",
+  "signature": "mono_image_get_filename(image)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getFullName",
+  "signature": "mono_class_getFullName(typeptr, isclass, nameformat)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getImage",
+  "signature": "mono_class_getImage(class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getNestedTypes",
+  "signature": "mono_class_getNestedTypes(class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getNestingType",
+  "signature": "mono_class_getNestingType(class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_isEnum",
+  "signature": "mono_class_isEnum(klass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getEnumValues",
+  "signature": "mono_class_getEnumValues(enumclass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_isValueType",
+  "signature": "mono_class_isValueType(klass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_isStruct",
+  "signature": "mono_class_isStruct(klass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_isSubClassOf",
+  "signature": "mono_class_isSubClassOf(klass,parentklass,checkInterfaces)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_isgeneric",
+  "signature": "mono_class_isgeneric(class)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_IsPrimitive",
+  "signature": "mono_class_IsPrimitive(klass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getVTable",
+  "signature": "mono_class_getVTable(domain, klass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_field_get_value_object",
+  "signature": "mono_field_get_value_object(monofield, object)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_getStaticFieldValue",
+  "signature": "mono_class_getStaticFieldValue(class, field)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_setStaticFieldValue",
+  "signature": "mono_class_setStaticFieldValue(class, field, value)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_getStaticFieldValue",
+  "signature": "mono_getStaticFieldValue(vtable, field)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_setStaticFieldValue",
+  "signature": "mono_setStaticFieldValue(vtable, field, value)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_object_enumValues",
+  "signature": "mono_object_enumValues(object)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_findInstancesOfClassListOnly",
+  "signature": "mono_class_findInstancesOfClassListOnly(domain, klass, progressBar)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_findInstancesOfClass",
+  "signature": "mono_class_findInstancesOfClass(domain, klass, OnScanDone, ProgressBar)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_findMethodWithParameters",
+  "signature": "mono_findMethodWithParameters(namespace, classname, methodname, parameters)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_findMethodByDesc",
+  "signature": "mono_findMethodByDesc(assemblyname, methoddesc)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_image_findMethodByDesc",
+  "signature": "mono_image_findMethodByDesc(image, methoddesc)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_getFullName",
+  "signature": "mono_method_getFullName(monomethod)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_get_parameters",
+  "signature": "mono_method_get_parameters(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_method_getFlags",
+  "signature": "mono_method_getFlags(method)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_invoke",
+  "signature": "mono_invoke(methodname,instance,arguments)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_object_init",
+  "signature": "mono_object_init(object)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_new_string",
+  "signature": "mono_new_string(domain, utf8str)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_string_readString",
+  "signature": "mono_string_readString(stringobject)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_array_new",
+  "signature": "mono_array_new(klass,count)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_array_element_size",
+  "signature": "mono_array_element_size(arrayKlass)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_arrayinstance_getCount",
+  "signature": "mono_arrayinstance_getCount(instance)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_arrayinstance_getItemAddress",
+  "signature": "mono_arrayinstance_getItemAddress(instance, index)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_image_rva_map",
+  "signature": "mono_image_rva_map(image, offset)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_getAssemblyNameFromClassName",
+  "signature": "mono_getAssemblyNameFromClassName(classname)"
+ },
+ {
+  "category": "Mono/.NET",
+  "name": "mono_class_enumInterfaces",
+  "signature": "mono_class_enumInterfaces(MonoClass)"
+ },
+ {
+  "category": "回调",
+  "name": "registerSymbolLookupCallback",
+  "signature": "registerSymbolLookupCallback(function, location)"
+ },
+ {
+  "category": "回调",
+  "name": "unregisterSymbolLookupCallback",
+  "signature": "unregisterSymbolLookupCallback(id)"
+ },
+ {
+  "category": "回调",
+  "name": "registerAddressLookupCallback",
+  "signature": "registerAddressLookupCallback(function)"
+ },
+ {
+  "category": "回调",
+  "name": "unregisterAddressLookupCallback",
+  "signature": "unregisterAddressLookupCallback(id)"
+ },
+ {
+  "category": "回调",
+  "name": "registerStructureAndElementListCallback",
+  "signature": "registerStructureAndElementListCallback(structFn, elemFn)"
+ },
+ {
+  "category": "回调",
+  "name": "registerGlobalStructureListUpdateNotification",
+  "signature": "registerGlobalStructureListUpdateNotification(function)"
+ },
+ {
+  "category": "回调",
+  "name": "unregisterGlobalStructureListUpdateNotification",
+  "signature": "unregisterGlobalStructureListUpdateNotification(id)"
+ },
+ {
+  "category": "回调",
+  "name": "registerEXETrainerFeature",
+  "signature": "registerEXETrainerFeature(name, function)"
+ },
+ {
+  "category": "回调",
+  "name": "registerLuaFunctionHighlight",
+  "signature": "registerLuaFunctionHighlight(functionname)"
+ },
+ {
+  "category": "Pipe",
+  "name": "createPipe",
+  "signature": "createPipe(name)"
+ },
+ {
+  "category": "Pipe",
+  "name": "connectToPipe",
+  "signature": "connectToPipe(name[, timeout])"
+ },
+ {
+  "category": "语言基础",
+  "name": "tonumber",
+  "signature": "tonumber(value[, base])"
+ },
+ {
+  "category": "语言基础",
+  "name": "tostring",
+  "signature": "tostring(value)"
+ },
+ {
+  "category": "语言基础",
+  "name": "type",
+  "signature": "type(value)"
+ },
+ {
+  "category": "语言基础",
+  "name": "pairs",
+  "signature": "pairs(t)"
+ },
+ {
+  "category": "语言基础",
+  "name": "ipairs",
+  "signature": "ipairs(t)"
+ },
+ {
+  "category": "语言基础",
+  "name": "pcall",
+  "signature": "pcall(f, ...)"
+ },
+ {
+  "category": "语言基础",
+  "name": "xpcall",
+  "signature": "xpcall(f, err)"
+ },
+ {
+  "category": "语言基础",
+  "name": "assert",
+  "signature": "assert(v, message)"
+ },
+ {
+  "category": "语言基础",
+  "name": "error",
+  "signature": "error(message)"
+ },
+ {
+  "category": "语言基础",
+  "name": "select",
+  "signature": "select(index, ...)"
+ },
+ {
+  "category": "语言基础",
+  "name": "next",
+  "signature": "next(t[, key])"
+ },
+ {
+  "category": "语言基础",
+  "name": "setmetatable",
+  "signature": "setmetatable(table, mt)"
+ },
+ {
+  "category": "语言基础",
+  "name": "getmetatable",
+  "signature": "getmetatable(object)"
+ },
+ {
+  "category": "语言基础",
+  "name": "rawget",
+  "signature": "rawget(table, key)"
+ },
+ {
+  "category": "语言基础",
+  "name": "rawset",
+  "signature": "rawset(table, key, value)"
+ },
+ {
+  "category": "语言基础",
+  "name": "rawequal",
+  "signature": "rawequal(a, b)"
+ },
+ {
+  "category": "语言基础",
+  "name": "load",
+  "signature": "load(chunk[, name])"
+ },
+ {
+  "category": "语言基础",
+  "name": "loadfile",
+  "signature": "loadfile(filename)"
+ },
+ {
+  "category": "语言基础",
+  "name": "dofile",
+  "signature": "dofile(filename)"
+ },
+ {
+  "category": "语言基础",
+  "name": "require",
+  "signature": "require(modname)"
+ },
+ {
+  "category": "语言基础",
+  "name": "collectgarbage",
+  "signature": "collectgarbage([opt])"
+ },
+ {
+  "category": "语言基础",
+  "name": "class",
+  "signature": "class() -- 创建 Lua 类"
+ },
+ {
+  "category": "string 库",
+  "name": "string.find",
+  "signature": "string.find(s, pattern[, init][, plain])"
+ },
+ {
+  "category": "string 库",
+  "name": "string.format",
+  "signature": "string.format(format, ...)"
+ },
+ {
+  "category": "string 库",
+  "name": "string.sub",
+  "signature": "string.sub(s, i[, j])"
+ },
+ {
+  "category": "string 库",
+  "name": "string.len",
+  "signature": "string.len(s)"
+ },
+ {
+  "category": "string 库",
+  "name": "string.lower",
+  "signature": "string.lower(s)"
+ },
+ {
+  "category": "string 库",
+  "name": "string.upper",
+  "signature": "string.upper(s)"
+ },
+ {
+  "category": "string 库",
+  "name": "string.gsub",
+  "signature": "string.gsub(s, pattern, repl[, n])"
+ },
+ {
+  "category": "string 库",
+  "name": "string.match",
+  "signature": "string.match(s, pattern[, init])"
+ },
+ {
+  "category": "string 库",
+  "name": "string.gmatch",
+  "signature": "string.gmatch(s, pattern)"
+ },
+ {
+  "category": "string 库",
+  "name": "string.rep",
+  "signature": "string.rep(s, n)"
+ },
+ {
+  "category": "string 库",
+  "name": "string.reverse",
+  "signature": "string.reverse(s)"
+ },
+ {
+  "category": "string 库",
+  "name": "string.byte",
+  "signature": "string.byte(s[, i][, j])"
+ },
+ {
+  "category": "string 库",
+  "name": "string.char",
+  "signature": "string.char(...)"
+ },
+ {
+  "category": "table 库",
+  "name": "table.insert",
+  "signature": "table.insert(t[, pos], value)"
+ },
+ {
+  "category": "table 库",
+  "name": "table.remove",
+  "signature": "table.remove(t[, pos])"
+ },
+ {
+  "category": "table 库",
+  "name": "table.concat",
+  "signature": "table.concat(t[, sep][, i][, j])"
+ },
+ {
+  "category": "table 库",
+  "name": "table.sort",
+  "signature": "table.sort(t[, comp])"
+ },
+ {
+  "category": "table 库",
+  "name": "table.pack",
+  "signature": "table.pack(...)"
+ },
+ {
+  "category": "table 库",
+  "name": "table.unpack",
+  "signature": "table.unpack(t[, i][, j])"
+ },
+ {
+  "category": "table 库",
+  "name": "table.move",
+  "signature": "table.move(a1, f, e, t, a2)"
+ },
+ {
+  "category": "table 库",
+  "name": "table.maxn",
+  "signature": "table.maxn(t)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.floor",
+  "signature": "math.floor(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.ceil",
+  "signature": "math.ceil(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.abs",
+  "signature": "math.abs(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.max",
+  "signature": "math.max(...)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.min",
+  "signature": "math.min(...)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.sqrt",
+  "signature": "math.sqrt(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.random",
+  "signature": "math.random([m][, n])"
+ },
+ {
+  "category": "math 库",
+  "name": "math.randomseed",
+  "signature": "math.randomseed(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.pi",
+  "signature": "math.pi"
+ },
+ {
+  "category": "math 库",
+  "name": "math.sin",
+  "signature": "math.sin(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.cos",
+  "signature": "math.cos(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.tan",
+  "signature": "math.tan(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.rad",
+  "signature": "math.rad(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.deg",
+  "signature": "math.deg(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.huge",
+  "signature": "math.huge"
+ },
+ {
+  "category": "math 库",
+  "name": "math.modf",
+  "signature": "math.modf(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.fmod",
+  "signature": "math.fmod(x, y)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.log",
+  "signature": "math.log(x[, base])"
+ },
+ {
+  "category": "math 库",
+  "name": "math.exp",
+  "signature": "math.exp(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.tointeger",
+  "signature": "math.tointeger(x)"
+ },
+ {
+  "category": "math 库",
+  "name": "math.type",
+  "signature": "math.type(x)"
+ },
+ {
+  "category": "os 库",
+  "name": "os.time",
+  "signature": "os.time([table])"
+ },
+ {
+  "category": "os 库",
+  "name": "os.date",
+  "signature": "os.date([format][, time])"
+ },
+ {
+  "category": "os 库",
+  "name": "os.clock",
+  "signature": "os.clock()"
+ },
+ {
+  "category": "os 库",
+  "name": "os.execute",
+  "signature": "os.execute(command)"
+ },
+ {
+  "category": "os 库",
+  "name": "os.getenv",
+  "signature": "os.getenv(varname)"
+ },
+ {
+  "category": "os 库",
+  "name": "os.remove",
+  "signature": "os.remove(filename)"
+ },
+ {
+  "category": "os 库",
+  "name": "os.rename",
+  "signature": "os.rename(old, new)"
+ },
+ {
+  "category": "os 库",
+  "name": "os.tmpname",
+  "signature": "os.tmpname()"
+ },
+ {
+  "category": "os 库",
+  "name": "os.difftime",
+  "signature": "os.difftime(t2, t1)"
+ },
+ {
+  "category": "os 库",
+  "name": "os.exit",
+  "signature": "os.exit([code])"
+ },
+ {
+  "category": "io 库",
+  "name": "io.open",
+  "signature": "io.open(filename[, mode])"
+ },
+ {
+  "category": "io 库",
+  "name": "io.close",
+  "signature": "io.close([file])"
+ },
+ {
+  "category": "io 库",
+  "name": "io.read",
+  "signature": "io.read(...)"
+ },
+ {
+  "category": "io 库",
+  "name": "io.write",
+  "signature": "io.write(...)"
+ },
+ {
+  "category": "io 库",
+  "name": "io.lines",
+  "signature": "io.lines([filename])"
+ },
+ {
+  "category": "io 库",
+  "name": "io.input",
+  "signature": "io.input([file])"
+ },
+ {
+  "category": "io 库",
+  "name": "io.output",
+  "signature": "io.output([file])"
+ },
+ {
+  "category": "io 库",
+  "name": "io.type",
+  "signature": "io.type(obj)"
+ },
+ {
+  "category": "io 库",
+  "name": "io.flush",
+  "signature": "io.flush()"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.band",
+  "signature": "bit.band(x, ...)"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.bor",
+  "signature": "bit.bor(x, ...)"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.bxor",
+  "signature": "bit.bxor(x, ...)"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.bnot",
+  "signature": "bit.bnot(x)"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.lshift",
+  "signature": "bit.lshift(x, n)"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.rshift",
+  "signature": "bit.rshift(x, n)"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.bswap",
+  "signature": "bit.bswap(x)"
+ },
+ {
+  "category": "bit 库",
+  "name": "bit.btest",
+  "signature": "bit.btest(x, ...)"
+ },
+ {
+  "category": "coroutine 库",
+  "name": "coroutine.create",
+  "signature": "coroutine.create(f)"
+ },
+ {
+  "category": "coroutine 库",
+  "name": "coroutine.resume",
+  "signature": "coroutine.resume(co, ...)"
+ },
+ {
+  "category": "coroutine 库",
+  "name": "coroutine.yield",
+  "signature": "coroutine.yield(...)"
+ },
+ {
+  "category": "coroutine 库",
+  "name": "coroutine.status",
+  "signature": "coroutine.status(co)"
+ },
+ {
+  "category": "coroutine 库",
+  "name": "coroutine.wrap",
+  "signature": "coroutine.wrap(f)"
+ },
+ {
+  "category": "coroutine 库",
+  "name": "coroutine.running",
+  "signature": "coroutine.running()"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "keyDown",
+  "signature": "keyDown(key) -- 按下按键不松开"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "keyUp",
+  "signature": "keyUp(key) -- 松开按键"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "doKeyPress",
+  "signature": "doKeyPress(key) -- 按下并松开一次"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "isKeyPressed",
+  "signature": "isKeyPressed(key) -- 该键当前是否按下"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "getKeyState",
+  "signature": "getKeyState(key) -- 取按键状态"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "createHotkey",
+  "signature": "createHotkey(function, key, ...) -- 注册全局热键"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "getMousePos",
+  "signature": "getMousePos() -- 返回 x, y"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "setMousePos",
+  "signature": "setMousePos(x, y) -- 移动鼠标"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "mouse_event",
+  "signature": "mouse_event(flags, dx, dy, data, extra)"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "doubleClick",
+  "signature": "doubleClick(button) -- 双击"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "getForegroundWindow",
+  "signature": "getForegroundWindow() -- 取前台窗口句柄"
+ },
+ {
+  "category": "按键/鼠标",
+  "name": "getWindowlist",
+  "signature": "getWindowlist() -- 枚举窗口"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_LBUTTON",
+  "signature": "VK_LBUTTON = 0x01 -- 鼠标左键"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_RBUTTON",
+  "signature": "VK_RBUTTON = 0x02 -- 鼠标右键"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_MBUTTON",
+  "signature": "VK_MBUTTON = 0x04 -- 鼠标中键"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_BACK",
+  "signature": "VK_BACK = 0x08 -- 退格"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_TAB",
+  "signature": "VK_TAB = 0x09"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_RETURN",
+  "signature": "VK_RETURN = 0x0D -- 回车"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_SHIFT",
+  "signature": "VK_SHIFT = 0x10"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_CONTROL",
+  "signature": "VK_CONTROL = 0x11"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_MENU",
+  "signature": "VK_MENU = 0x12 -- Alt"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_PAUSE",
+  "signature": "VK_PAUSE = 0x13"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_CAPITAL",
+  "signature": "VK_CAPITAL = 0x14 -- CapsLock"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_ESCAPE",
+  "signature": "VK_ESCAPE = 0x1B"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_SPACE",
+  "signature": "VK_SPACE = 0x20 -- 空格"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_PRIOR",
+  "signature": "VK_PRIOR = 0x21 -- PageUp"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_NEXT",
+  "signature": "VK_NEXT = 0x22 -- PageDown"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_END",
+  "signature": "VK_END = 0x23"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_HOME",
+  "signature": "VK_HOME = 0x24"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_LEFT",
+  "signature": "VK_LEFT = 0x25 -- 左方向键"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_UP",
+  "signature": "VK_UP = 0x26 -- 上方向键"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_RIGHT",
+  "signature": "VK_RIGHT = 0x27 -- 右方向键"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_DOWN",
+  "signature": "VK_DOWN = 0x28 -- 下方向键"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_INSERT",
+  "signature": "VK_INSERT = 0x2D"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_DELETE",
+  "signature": "VK_DELETE = 0x2E"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_NUMPAD0",
+  "signature": "VK_NUMPAD0 = 0x60 -- 小键盘 0"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_NUMPAD1",
+  "signature": "VK_NUMPAD1 = 0x61"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_NUMPAD2",
+  "signature": "VK_NUMPAD2 = 0x62"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_NUMPAD3",
+  "signature": "VK_NUMPAD3 = 0x63"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_MULTIPLY",
+  "signature": "VK_MULTIPLY = 0x6A -- 小键盘 *"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_ADD",
+  "signature": "VK_ADD = 0x6B -- 小键盘 +"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_SUBTRACT",
+  "signature": "VK_SUBTRACT = 0x6D -- 小键盘 -"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F1",
+  "signature": "VK_F1 = 0x70"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F2",
+  "signature": "VK_F2 = 0x71"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F3",
+  "signature": "VK_F3 = 0x72"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F4",
+  "signature": "VK_F4 = 0x73"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F5",
+  "signature": "VK_F5 = 0x74"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F6",
+  "signature": "VK_F6 = 0x75"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F7",
+  "signature": "VK_F7 = 0x76"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F8",
+  "signature": "VK_F8 = 0x77"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F9",
+  "signature": "VK_F9 = 0x78"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F10",
+  "signature": "VK_F10 = 0x79"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F11",
+  "signature": "VK_F11 = 0x7A"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_F12",
+  "signature": "VK_F12 = 0x7B"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_NUMLOCK",
+  "signature": "VK_NUMLOCK = 0x90"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_LSHIFT",
+  "signature": "VK_LSHIFT = 0xA0 -- 左 Shift"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_RSHIFT",
+  "signature": "VK_RSHIFT = 0xA1 -- 右 Shift"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_LCONTROL",
+  "signature": "VK_LCONTROL = 0xA2 -- 左 Ctrl"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_RCONTROL",
+  "signature": "VK_RCONTROL = 0xA3 -- 右 Ctrl"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_LMENU",
+  "signature": "VK_LMENU = 0xA4 -- 左 Alt"
+ },
+ {
+  "category": "虚拟键码",
+  "name": "VK_RMENU",
+  "signature": "VK_RMENU = 0xA5 -- 右 Alt"
+ },
+ {
+  "category": "运算符",
+  "name": "==",
+  "signature": "== 等于（如 eax == 0x5）"
+ },
+ {
+  "category": "运算符",
+  "name": "!=",
+  "signature": "!= 不等于（如 [ebx] != 10）"
+ },
+ {
+  "category": "运算符",
+  "name": "<=",
+  "signature": "<= 小于等于（如 edx <= 5）"
+ },
+ {
+  "category": "运算符",
+  "name": ">=",
+  "signature": ">= 大于等于（如 [esi+8] >= 0x20）"
+ },
+ {
+  "category": "运算符",
+  "name": "&&",
+  "signature": "&& 逻辑与（多条件同时满足）"
+ },
+ {
+  "category": "运算符",
+  "name": "||",
+  "signature": "|| 逻辑或（至少满足一个）"
+ },
+ {
+  "category": "运算符",
+  "name": "<<",
+  "signature": "<< 左移（如 ebx << 1）"
+ },
+ {
+  "category": "运算符",
+  "name": ">>",
+  "signature": ">> 右移"
+ },
+ {
+  "category": "运算符",
+  "name": "~=",
+  "signature": "~= Lua 不等于（Lua 用此而非 !=）"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "byte",
+  "signature": "byte -- 1 字节尺寸说明符（配合 ptr）；np3watch 中按 1 字节读取"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "word",
+  "signature": "word -- 2 字节尺寸说明符；np3watch 中按 2 字节读取"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "dword",
+  "signature": "dword -- 4 字节尺寸说明符；np3watch 中按 4 字节读取"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "qword",
+  "signature": "qword -- 8 字节尺寸说明符；np3watch 中按 8 字节读取"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "ptr",
+  "signature": "ptr -- 指针尺寸说明符（如 dword ptr [esi]）；np3watch 中等同 pointer"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "byte ptr",
+  "signature": "byte ptr [addr] -- 按 1 字节访问内存"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "word ptr",
+  "signature": "word ptr [addr] -- 按 2 字节访问内存"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "dword ptr",
+  "signature": "dword ptr [addr] -- 按 4 字节访问内存"
+ },
+ {
+  "category": "汇编尺寸",
+  "name": "qword ptr",
+  "signature": "qword ptr [addr] -- 按 8 字节访问内存"
+ },
+ {
+  "category": "寄存器",
+  "name": "eax",
+  "signature": "eax -- 32 位累加器"
+ },
+ {
+  "category": "寄存器",
+  "name": "ebx",
+  "signature": "ebx -- 32 位基址"
+ },
+ {
+  "category": "寄存器",
+  "name": "ecx",
+  "signature": "ecx -- 32 位计数器"
+ },
+ {
+  "category": "寄存器",
+  "name": "edx",
+  "signature": "edx -- 32 位数据"
+ },
+ {
+  "category": "寄存器",
+  "name": "esi",
+  "signature": "esi -- 32 位源变址"
+ },
+ {
+  "category": "寄存器",
+  "name": "edi",
+  "signature": "edi -- 32 位目的变址"
+ },
+ {
+  "category": "寄存器",
+  "name": "esp",
+  "signature": "esp -- 32 位栈顶"
+ },
+ {
+  "category": "寄存器",
+  "name": "ebp",
+  "signature": "ebp -- 32 位栈基"
+ },
+ {
+  "category": "寄存器",
+  "name": "eip",
+  "signature": "eip -- 32 位指令指针"
+ },
+ {
+  "category": "寄存器",
+  "name": "eflags",
+  "signature": "eflags -- 32 位标志寄存器"
+ },
+ {
+  "category": "寄存器",
+  "name": "rax",
+  "signature": "rax -- 64 位累加器"
+ },
+ {
+  "category": "寄存器",
+  "name": "rbx",
+  "signature": "rbx -- 64 位基址"
+ },
+ {
+  "category": "寄存器",
+  "name": "rcx",
+  "signature": "rcx -- 64 位计数器"
+ },
+ {
+  "category": "寄存器",
+  "name": "rdx",
+  "signature": "rdx -- 64 位数据"
+ },
+ {
+  "category": "寄存器",
+  "name": "rsi",
+  "signature": "rsi -- 64 位源变址"
+ },
+ {
+  "category": "寄存器",
+  "name": "rdi",
+  "signature": "rdi -- 64 位目的变址"
+ },
+ {
+  "category": "寄存器",
+  "name": "rsp",
+  "signature": "rsp -- 64 位栈顶"
+ },
+ {
+  "category": "寄存器",
+  "name": "rbp",
+  "signature": "rbp -- 64 位栈基"
+ },
+ {
+  "category": "寄存器",
+  "name": "rip",
+  "signature": "rip -- 64 位指令指针"
+ },
+ {
+  "category": "寄存器",
+  "name": "rflags",
+  "signature": "rflags -- 64 位标志寄存器"
+ },
+ {
+  "category": "寄存器",
+  "name": "cs",
+  "signature": "cs -- 段寄存器"
+ },
+ {
+  "category": "寄存器",
+  "name": "ds",
+  "signature": "ds -- 段寄存器"
+ },
+ {
+  "category": "寄存器",
+  "name": "es",
+  "signature": "es -- 段寄存器"
+ },
+ {
+  "category": "寄存器",
+  "name": "fs",
+  "signature": "fs -- 段寄存器（常存 TEB）"
+ },
+ {
+  "category": "寄存器",
+  "name": "gs",
+  "signature": "gs -- 段寄存器"
+ },
+ {
+  "category": "寄存器",
+  "name": "ss",
+  "signature": "ss -- 段寄存器"
+ },
+ {
+  "category": "寄存器",
+  "name": "zf",
+  "signature": "zf -- 零标志位（结果为 0 时置 1）"
+ },
+ {
+  "category": "寄存器",
+  "name": "cf",
+  "signature": "cf -- 进位标志位"
+ },
+ {
+  "category": "寄存器",
+  "name": "of",
+  "signature": "of -- 溢出标志位"
+ },
+ {
+  "category": "寄存器",
+  "name": "sf",
+  "signature": "sf -- 符号标志位"
+ },
+ {
+  "category": "寄存器",
+  "name": "pf",
+  "signature": "pf -- 奇偶标志位"
+ },
+ {
+  "category": "寄存器",
+  "name": "af",
+  "signature": "af -- 辅助进位标志位"
+ },
+ {
+  "category": "条件断点",
+  "name": "$address",
+  "signature": "$address -- 断点所在指令地址"
+ },
+ {
+  "category": "汇编指令",
+  "name": "mov",
+  "signature": "mov 目的,源 -- 赋值 / 拷贝（mov eax,[ebx]）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "cmp",
+  "signature": "cmp a,b -- 比较，结果存入标志位"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jmp",
+  "signature": "jmp 目标 -- 无条件跳转"
+ },
+ {
+  "category": "汇编指令",
+  "name": "je",
+  "signature": "je -- 相等则跳（== / zf=1）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jz",
+  "signature": "jz -- 零标志置位则跳（= je）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jne",
+  "signature": "jne -- 不相等则跳（!=）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jnz",
+  "signature": "jnz -- 非零则跳（= jne）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "ja",
+  "signature": "ja -- 无符号大于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jg",
+  "signature": "jg -- 有符号大于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jb",
+  "signature": "jb -- 无符号小于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jl",
+  "signature": "jl -- 有符号小于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jae",
+  "signature": "jae -- 无符号大于等于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jge",
+  "signature": "jge -- 有符号大于等于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jna",
+  "signature": "jna -- 无符号不大于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jng",
+  "signature": "jng -- 有符号不大于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jnb",
+  "signature": "jnb -- 无符号不小于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jnl",
+  "signature": "jnl -- 有符号不小于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jnae",
+  "signature": "jnae -- 无符号不大于等于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jnge",
+  "signature": "jnge -- 有符号不大于等于则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jc",
+  "signature": "jc -- 进位则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jnc",
+  "signature": "jnc -- 无进位则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jo",
+  "signature": "jo -- 溢出则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jno",
+  "signature": "jno -- 不溢出则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "js",
+  "signature": "js -- 符号位为 1 则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jns",
+  "signature": "jns -- 符号位为 0 则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jp",
+  "signature": "jp -- 奇偶为偶则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jnp",
+  "signature": "jnp -- 奇偶为奇则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jecxz",
+  "signature": "jecxz -- ECX=0 则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "jcxz",
+  "signature": "jcxz -- CX=0 则跳"
+ },
+ {
+  "category": "汇编指令",
+  "name": "push",
+  "signature": "push 值 -- 入栈"
+ },
+ {
+  "category": "汇编指令",
+  "name": "pop",
+  "signature": "pop 值 -- 出栈"
+ },
+ {
+  "category": "汇编指令",
+  "name": "call",
+  "signature": "call 地址/标签 -- 调用子程序"
+ },
+ {
+  "category": "汇编指令",
+  "name": "ret",
+  "signature": "ret -- 过程返回"
+ },
+ {
+  "category": "汇编指令",
+  "name": "lea",
+  "signature": "lea 目的,源 -- 取有效地址（lea eax,[ebx+4]）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "add",
+  "signature": "add a,b -- a = a + b"
+ },
+ {
+  "category": "汇编指令",
+  "name": "sub",
+  "signature": "sub a,b -- a = a - b"
+ },
+ {
+  "category": "汇编指令",
+  "name": "inc",
+  "signature": "inc 操作数 -- 加 1"
+ },
+ {
+  "category": "汇编指令",
+  "name": "dec",
+  "signature": "dec 操作数 -- 减 1；np3watch 中表示十进制输出（同 decimal）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "mul",
+  "signature": "mul 操作数 -- 无符号乘法"
+ },
+ {
+  "category": "汇编指令",
+  "name": "imul",
+  "signature": "imul 操作数 -- 有符号乘法"
+ },
+ {
+  "category": "汇编指令",
+  "name": "div",
+  "signature": "div 操作数 -- 无符号除法"
+ },
+ {
+  "category": "汇编指令",
+  "name": "idiv",
+  "signature": "idiv 操作数 -- 有符号除法"
+ },
+ {
+  "category": "汇编指令",
+  "name": "xor",
+  "signature": "xor a,b -- 按位异或"
+ },
+ {
+  "category": "汇编指令",
+  "name": "test",
+  "signature": "test a,b -- 按位与测试（仅改标志位）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "shl",
+  "signature": "shl 操作数,位数 -- 逻辑左移"
+ },
+ {
+  "category": "汇编指令",
+  "name": "shr",
+  "signature": "shr 操作数,位数 -- 逻辑右移"
+ },
+ {
+  "category": "汇编指令",
+  "name": "sal",
+  "signature": "sal -- 算术左移（= shl）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "sar",
+  "signature": "sar -- 算术右移（= shr）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "xchg",
+  "signature": "xchg a,b -- 交换"
+ },
+ {
+  "category": "汇编指令",
+  "name": "movsx",
+  "signature": "movsx -- 符号扩展后传送"
+ },
+ {
+  "category": "汇编指令",
+  "name": "movzx",
+  "signature": "movzx -- 零扩展后传送"
+ },
+ {
+  "category": "汇编指令",
+  "name": "neg",
+  "signature": "neg 操作数 -- 求补（0 减之）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "nop",
+  "signature": "nop -- 空操作（占位/对齐）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "int3",
+  "signature": "int3 -- 软件断点（CC）"
+ },
+ {
+  "category": "汇编指令",
+  "name": "originalcode",
+  "signature": "originalcode -- AA 模板里原指令的跳转标签"
+ },
+ {
+  "category": "CE 全局",
+  "name": "syntaxcheck",
+  "signature": "syntaxcheck -- 当前脚本语法检查对象"
+ },
+ {
+  "category": "CE 全局",
+  "name": "memrec",
+  "signature": "memrec -- 当前内存记录对象"
+ },
+ {
+  "category": "CE 全局",
+  "name": "process",
+  "signature": "process -- 当前进程对象"
+ },
+ {
+  "category": "CE 全局",
+  "name": "TrainerOrigin",
+  "signature": "TrainerOrigin -- 训练器来源"
+ },
+ {
+  "category": "CE 全局",
+  "name": "MainForm",
+  "signature": "MainForm -- CE 主窗体"
+ },
+ {
+  "category": "CE 全局",
+  "name": "getLuaEngine",
+  "signature": "getLuaEngine() -- 当前 Lua 引擎"
+ },
+ {
+  "category": "CE 全局",
+  "name": "targetIs64Bit",
+  "signature": "targetIs64Bit() -- 目标是否 64 位"
+ },
+ {
+  "category": "CE 全局",
+  "name": "_G",
+  "signature": "_G -- 全局表"
+ },
+ {
+  "category": "CE 全局",
+  "name": "_VERSION",
+  "signature": "_VERSION -- Lua 版本"
+ },
+ {
+  "category": "自动汇编",
+  "name": "np3watch",
+  "signature": "// np3watch 名称 [类型] [进制] [数量] [if 条件] -- 手动监控变量/寄存器值"
+ },
+ {
+  "category": "自动汇编",
+  "name": "begin",
+  "signature": "// np3watch begin [if 条件] -- 监控块开始，块内行继承条件"
+ },
+ {
+  "category": "自动汇编",
+  "name": "np3unwatch",
+  "signature": "// np3unwatch 名称 -- 取消该符号的自动监控"
+ },
+ {
+  "category": "自动汇编",
+  "name": "np3nowatch",
+  "signature": "// np3nowatch 名称 -- 同 np3unwatch"
+ },
+ {
+  "category": "监视类型",
+  "name": "pointer",
+  "signature": "pointer -- np3watch 指针类型（按目标进程位宽读取）"
+ },
+ {
+  "category": "监视类型",
+  "name": "string",
+  "signature": "string -- np3watch ASCII 字符串（默认 64 字符）"
+ },
+ {
+  "category": "监视类型",
+  "name": "wstring",
+  "signature": "wstring -- np3watch UTF-16 宽字符串（默认 64 字符）"
+ },
+ {
+  "category": "监视类型",
+  "name": "array",
+  "signature": "array -- np3watch 数组（默认 4 项，可追加数量）"
+ },
+ {
+  "category": "监视类型",
+  "name": "auto",
+  "signature": "auto -- np3watch 自动推断类型或进制"
+ },
+ {
+  "category": "监视类型",
+  "name": "reg",
+  "signature": "reg -- np3watch 寄存器类型（rax/eax/al/rip/flags 等自动识别）"
+ },
+ {
+  "category": "监视类型",
+  "name": "u8",
+  "signature": "u8 -- np3watch 无符号 8 位整数（byte 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "u16",
+  "signature": "u16 -- np3watch 无符号 16 位整数（word 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "u32",
+  "signature": "u32 -- np3watch 无符号 32 位整数（dword 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "u64",
+  "signature": "u64 -- np3watch 无符号 64 位整数（qword 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "i8",
+  "signature": "i8 -- np3watch 有符号 8 位整数（byte 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "i16",
+  "signature": "i16 -- np3watch 有符号 16 位整数（word 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "i32",
+  "signature": "i32 -- np3watch 有符号 32 位整数（dword 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "i64",
+  "signature": "i64 -- np3watch 有符号 64 位整数（qword 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "f32",
+  "signature": "f32 -- np3watch 单精度浮点（float 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "f64",
+  "signature": "f64 -- np3watch 双精度浮点（double 别名）"
+ },
+ {
+  "category": "监视类型",
+  "name": "str",
+  "signature": "str -- np3watch 字符串别名（同 string）"
+ },
+ {
+  "category": "监视类型",
+  "name": "wstr",
+  "signature": "wstr -- np3watch 宽字符串别名（同 wstring）"
+ },
+ {
+  "category": "监视类型",
+  "name": "arr",
+  "signature": "arr -- np3watch 数组别名（同 array）"
+ },
+ {
+  "category": "监视类型",
+  "name": "float",
+  "signature": "float -- np3watch 单精度浮点读取（4 字节）"
+ },
+ {
+  "category": "监视类型",
+  "name": "double",
+  "signature": "double -- np3watch 双精度浮点读取（8 字节）"
+ },
+ {
+  "category": "监视进制",
+  "name": "bin",
+  "signature": "bin -- np3watch 二进制输出（binary 别名）"
+ },
+ {
+  "category": "监视进制",
+  "name": "hex",
+  "signature": "hex -- np3watch 十六进制输出（默认）"
+ },
+ {
+  "category": "监视进制",
+  "name": "binary",
+  "signature": "binary -- np3watch 二进制输出（同 bin）"
+ },
+ {
+  "category": "监视进制",
+  "name": "decimal",
+  "signature": "decimal -- np3watch 十进制输出（同 dec）"
+ },
+ {
+  "category": "监视进制",
+  "name": "hexadecimal",
+  "signature": "hexadecimal -- np3watch 十六进制输出（同 hex）"
+ },
+ {
+  "category": "监视开关",
+  "name": "on",
+  "signature": "on -- np3watch 恢复自动监控（默认）"
+ },
+ {
+  "category": "监视开关",
+  "name": "off",
+  "signature": "off -- np3watch 关闭自动监控，仅保留手动项"
+ }
+]
